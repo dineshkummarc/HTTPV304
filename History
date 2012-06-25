@@ -1,0 +1,212 @@
+-------------------------------------------------------------------------------
+History Log for HTTP Service  
+  
+  Legend:
+   - Fixes
+   + Features
+   = Internal changes
+   * Changes required to migrate from one release to another
+
+-------------------------------------------------------------------------------
+
+Version 3.0.4: 12/09/2011
+
+  - Added documentation for the HELP and VERSION options to the HTTP Service
+    User's Guide (Bug #3426508)
+  + Changed to use the IGNOREERRORS option when resolving STAF variables in the
+    CONTENT option for DOPOST and REQUEST METHOD requests so that strings
+    containing an unescaped { that does not denote a STAF variable do not cause
+    an error (Feature #3426518) 
+  
+-------------------------------------------------------------------------------
+
+Version 3.0.3: 09/28/2011
+
+  + Added basic HTTP Proxy support for a session (Feature #3402054)
+
+-------------------------------------------------------------------------------
+
+Version 3.0.2: 12/15/2009
+
+  - Improved error messages for invalid command requests and added exception
+    catching when handling a service request (Bug #2895347)  
+
+-------------------------------------------------------------------------------
+
+Version 3.0.1: 09/24/2008
+
+  - Updated the HTTP Service User's Guide in the "Request Management" section
+    by removing an invalid sentence regarding the HEADER option (Bug #1998939)
+  - Fixed a NullPointerException in WebSession.setCurrentContents() at line 527
+    (Bug #2012777)
+  - Added support for handling escaped-encoded urls by adding an ENCODED option
+    for REQUEST, DOPOST, and DOGET requests (Bug #2016140)
+  - Fixed a problem where closing a HTTP session didn't close the socket -- it
+    left the socket in a CLOSE_WAIT state (Bug #2035310)
+  - Fixed an ArrayIndexOutOfBoundsException in SessionList.findID() at line 118
+    (Bug #2043371)
+      
+-------------------------------------------------------------------------------
+
+Version 3.0.0: 06/20/2008
+
+  + Changed STAF license from the Common Public License (CPL) 1.0 to the
+    Eclipse Public License (EPL) 1.0 (Feature #1893042)
+  - Fixed a problem where the temporary session file(s) were not always cleaned
+    up when closing a session (Bug #1917494)
+  + Changed the makefile to dynamically create the MANIFEST.MF file for the
+    HTTP service (Feature #1013104)
+  - Fixed an OutOfMemoryError that could occur when getting a large file
+    containing non-HTML data, such as a zip file, by changing to only parse the
+    content if the Content-Type header specifies "text/html" (Bug #1931428)
+  + Added the ability to set whether to parse content as HTML for a session
+    (Feature #1933723)
+  + Updated to use Commons HttpClient V3.1 (Feature #1737408)
+   
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 13: 10/08/2007
+
+  - Fixed a RC 38 (HIERARCHY_REQUEST_ERR) error parsing XHTML documents
+    (Bug #1498524)
+  - Fixed HTTP makefile compile problem (Bug #1776446)
+  + Updated to use Commons HttpClient V3.0.1 and Commons Logging V1.1
+    (Feature #1737408)  
+
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 12: 07/12/2006
+
+  - Fixed a problem in the LIST LINKS request where the link name was not being
+    assigned correctly (Bug #1407710)
+  + Updated to use CyberNeko HTML Parser V0.9.5 and Commons HttpClient V3.0
+    (Feature #1415860)
+  - Fixed NullPointerException that can occur in an HTTP DOGET request when
+    a IOException occurs and added Java stack trace to result (Bug #143980)
+  - Fixed OutOfMemoryError on HTTP DOGET/REQUEST/DOPOST, etc. request for large
+    files (Bug #1398674)
+  - Fixed a memory leak in the HTTP service (Bug #1431051)
+  - Updated to not use APIs deprecated in HTTPClient V3 (Bug #1491912)
+  
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 11: 12/07/2005
+
+  - Fixed a problem when using the FILE option on a request such as DOGET
+    where the result stored in the specified file is corrupted (Bug #1375570)
+    
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 10: 09/29/2005
+
+  + Provided the ability to mask passwords and other sensitive data
+    (Feature #622392)
+  + Updated to require STAF V3.1.0 or later using the new compareSTAFVersion()
+    method since utilizing new privacy methods (Feature #1292268)  
+  
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 9: 05/25/2005
+
+  - Fixed Null Pointer Exception using CONTENTFILE option (Bug #1193873)
+  + Provided better support for relative URLs (Feature #1013094)
+  
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 8: 04/23/2005
+
+  - Improved error message provided for RC 25 (Access Denied) for all requests
+    (Bug #1054858) 
+  - Changed to use STAFUtil's common resolve variable methods (Bug #1151440)
+  - Changed to use STAF's temporary directory to store temporary files
+    created by the HTTP service
+  - Fixed problem submitting forms with an INPUT FILE control type
+    (Bug #1155345)
+  - Change to determine session owner using STAF instance UUID (Bug #1157057)
+  - Changed license from GPL to CPL for all source code (Bug #1149491) 
+  - Fixed Java ClassCastException querying a form by index (Bug #1170178)  
+  - Updated to use CyberNeko HTML Parser V0.9.4 and Commons HttpClient V3.0-RC2
+    (Bug #1188680)
+    
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 7: 12/13/2004
+
+  + Removed the quotes and commas from the verbose output for STAF command
+    line output (Feature #550251)
+  
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 6: 11/19/2004
+
+  - Removed line separators from message text to display better
+  - Fixed typo in HTTP Service Guide to reference the right jar file name
+  
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 5: 10/30/2004
+
+  + Changed to return STAFResult from init/term methods (Feature #584049)
+  + Updated to marshall multi-valued results from LIST, QUERY, REQUEST,
+    DOPOST, DOGET, SUBMIT FORM, and FOLLOW LINK requests (Feature #740150)
+  + Changed to use new STAFServiceInterfaceLevel30 (Feature #550251)
+
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 4: 09/29/2004
+
+  = Switched code base for non-session requests to use a temporary session
+  - Fixed TRACE request behavior to display response message body in 
+    non-session requests
+  - Fixed 404 behavior now return rc 4404 as documentation indicates
+  + Added session support (Feature #1004825)
+  + Added SSL support (Feature #1004825)
+  + Added Basic, Digest, and NTLM Authentication support (Feature #1004825)
+  + Added Session persistant headers (Feature #1004825)
+  + Added Cookie support (Feature #1004825)
+  + Added PARAMETER option to provide support for method parameters 
+    (Feature #1011721)
+  + Added CONTENTFILE option to improve multi-file post support 
+    (Feature #1011721)
+  + Added form manipulation support (Feature #1004825)
+  + Added link folllowing support  (Feature #1004825)
+
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 3: 06/28/2004
+
+  - Changed to return new RC 4004 (IO Exception) instead of RC 38 (Java error)
+    when a Java IOException occurs due to not being able to find the page
+    requested for REQUEST/DOPOST/DOGET requests.  Also, added code to 
+    unregister all HTTP return codes with the HELP service when the HTTP
+    service is terminated. (Bug #944926)
+  + Added un-register of the service handle during term() (Feature #966079)
+
+-------------------------------------------------------------------------------
+
+Version 3.0.0 Beta 2: 04/29/2004
+
+  + Updated to use STAFServiceInterfaceLevel5, only supported in STAF V3.0.0
+    (Feature #464843) 
+
+-------------------------------------------------------------------------------
+
+Version 1.0.5: 02/27/2004
+
+  + Instrumented the HTTP service's handling of REQUEST/DOPOST/DOGET requests
+    to record diagnostics data to help prepare for the migration to STAF V3.0.
+    The HTTP service requires STAF V2.6.0 or later as a result of this change.
+    (Feature #853620)  
+
+-------------------------------------------------------------------------------
+
+Version 1.0.4: 10/09/2003
+
+  - Fixed problem where HTTP was returning an incorrect error message when
+    receiving an invalid command request (Bug #820920)
+
+-------------------------------------------------------------------------------
+
+Previous History is not available
+
+-------------------------------------------------------------------------------

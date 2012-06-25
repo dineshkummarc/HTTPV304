@@ -1,0 +1,4425 @@
+<!--
+***************************************************************************
+* Software Testing Automation Framework (STAF)
+* (C) Copyright IBM Corp. 2002, 2005
+*
+* This software is licensed under the Eclipse Public License (EPL) V1.0.
+****************************************************************************
+-->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META name="GENERATOR" content="IBM WebSphere Studio Homepage Builder V6.0.2 for Windows">
+<META http-equiv="Content-Style-Type" content="text/css">
+<TITLE>HTTP Service</TITLE>
+
+</HEAD><BODY bgcolor=#ffffff>
+
+<A NAME=Top_Of_Page></A>
+
+<H1>HTTP Service User's Guide</H1>
+
+<p><b>Version 3.0.4</b></p>
+<p><b>Last updated: Decembmer 9, 2011</b>
+
+<HR><H2><A NAME=ToC>Table of Contents</A></H2>
+<p>
+<ul>
+
+<LI><A name=ToC_2 href="#Desc" >Description</A>
+<p>
+<LI><A name=ToC_2a href="#SWReq" >Software Requirements</A>
+<p>
+<LI><A name=ToC_3 href="#Reg" >Installation and Configuration</A>
+<p>
+<LI><A href=#Syntax name="ToC_Syntax">Request Syntax</A>
+  <ul>
+  <li><a href=#SessMgmt name="ToC_SessMgmt">Session Management</a>
+  <UL>
+    <LI><A href=#OPEN name="ToC_OPEN">OPEN SESSION</A>
+    <LI><A href=#CLOSE name="ToC_CLOSE">CLOSE SESSION</A>
+    <LI><A href=#LIST name="ToC_LIST">LIST SESSIONS</A>
+    <LI><A href=#QUERY name="ToC_QUERY">QUERY SESSION</A>
+    <LI><A href=#SHOW name="ToC_SHOW">GET SESSION CONTENT</A>
+    <LI><A href=#REDIRECT name="ToC_REDIRECT">SET SESSION REDIRECT</A>
+    <LI><A href=#PARSECONTENT name="ToC_PARSECONTENT">SET SESSION PARSECONTENT</A>
+    <LI><A href=#HTTPPROXY name="ToC_HTTPPROXY">SET SESSION HTTPPROXYHOST</A>
+  </UL>
+  <li><a href=#ReqMgmt name="ToC_ReqMgmt">Request Management</a>
+  <UL>
+    <LI><A name=ToC_5 href="#Request" >REQUEST</A>
+    <LI><A name=ToC_6 href="#DoPost">DOPOST</A>
+    <LI><A name=ToC_7 href="#DoGet">DOGET</A>
+  </UL>
+  <LI><a href=#AUTHENTICATION name="ToC_AUTHENTICATION">Preemptive Authentication Management</a>
+  <ul>
+    <li><A href=#AUTHENTICATION_LIST>LIST AUTHENTICATIONHOSTS</a>
+    <li><A href=#AUTHENTICATION_QUERY>QUERY AUTHENTICATIONHOST</a>
+    <li><A href=#AUTHENTICATION_SET>SET AUTHENTICATIONHOST</a>
+    <li><A href=#AUTHENTICATION_DELETE>DELETE AUTHENTICATIONHOST</a>
+  </ul>
+  <li><a href=#DEFAULTHEADER name="ToC_DEFAULTHEADER">Default Header Management</a>
+  <ul>
+    <li><A href=#DEFAULTHEADER_LIST>LIST DEFAULTHEADERS</a>
+    <li><A href=#DEFAULTHEADER_QUERY>QUERY DEFAULTHEADER</a>
+    <li><A href=#DEFAULTHEADER_SET>SET DEFAULTHEADER</a>
+    <li><A href=#DEFAULTHEADER_DELETE>DELETE DEFAULTHEADER</a>
+  </ul>
+  <li><a href=#COOKIE name="ToC_COOKIE">Cookie Management</a>
+  <UL>
+    <LI><A href=#COOKIE_LIST>LIST COOKIES</A>
+    <LI><A href=#COOKIE_QUERY>QUERY COOKIE</A>
+    <LI><A href=#COOKIE_SET>SET COOKIE</A>
+    <LI><A href=#COOKIE_DELETE>DELETE COOKIE</A>
+  </UL>
+  <li><a href="#FORM" name="ToC_FORM">Form Management</a>
+  <UL>
+    <LI><A href=#FORM_LIST>LIST FORMS</A>
+    <LI><A href="#FORM_CONTROLS_LIST">LIST FORM CONTROLNAMES</A>
+    <LI><A href=#FORM_QUERY>QUERY FORM</A>
+    <li><a href="#FORM_SET">SET FORM</a>
+    <LI><A href=#FORM_SUBMIT>SUBMIT FORM</A>
+    <LI><A href=#FORM_RESET>RESET FORM</A>
+  </UL>
+  <li><a href="#LINK" name="ToC_LINK">Link Management</a>
+  <UL>
+    <LI><A href=#LINK_LIST>LIST LINKS</A>
+    <LI><A href=#LINK_QUERY>QUERY LINK</A>
+    <LI><A href=#LINK_FOLLOW>FOLLOW LINK</A>
+  </UL>
+  <li><a href="#VERSION" name="ToC_VERSION">Version</a>
+  <li><a href="#HELP" name="ToC_HELP">Help</a>
+</ul>
+<p>
+<LI><A name=ToC_SessionExample href="#SessionExample" >Session Examples</A></LI>
+  <ul>
+    <li><a name="ToC_Example1" href="#Example1">Example 1: SSL Login Using Cookie Authentication and a Form</a></li>
+    <li><a name="ToC_Example2" href="#Example2">Example 2: Cookie Manipulation</a></li>
+    <li><a name="ToC_Example3" href="#Example3">Example 3: Using Default Headers</a></li>
+    <li><a name="ToC_Example4" href="#Example4">Example 4: Using Links</a></li>
+  </ul>
+<p>
+<LI><A name=ToC_8 href="#Errors" >HTTP Error Code Reference</A></LI>
+<p>
+<LI><A href="#Form Controls" name="ToC_AppFC">Appendix A: Form Control Guide</A>
+<p>
+<LI><A href="#SSL" name="ToC_AppSSL">Appendix B: SSL</A>
+<p>
+<LI><A name="ToC_AppAck" href="#AppendixAck">Appendix C: Licenses and Acknowledgements</A></LI>
+</ul>
+<HR>
+<H1><A name=Desc href="#ToC_2">Description</A></H1>
+The HTTP service is an external STAF service that provides the ability
+to quickly and easily make HTTP requests. These requests can be grouped
+together in a session. Performing requests in a session provides the ability
+simulate a browsing experience. Since a session provides memory about the
+last request it is possible to manipulate cookies, login into secure http
+sites, and interact with form and link html elements that are returned
+from requests.
+<H1><A name=SWReq href="#ToC_2a">Software Requirements</A></H1>
+This service requires:
+<ul>
+  <LI>Java 1.4 or later</LI>
+  <LI>STAF 3.4.0 or later</LI>
+  <LI>JSSE is needed for <a href=#SSL>SSL</a>. It is bundled with Sun Java 1.4 and later</LI>
+  <p><b>Note:</b>  If you have problems using SSL, you may need to use a later Java (e.g. 1.4.2 or later).
+</ul>
+
+<H1><A name=Reg href="#ToC_3">Installation and Configuration</A></H1>
+
+Install the HTTP service by downloading the HTTPV304.zip/tar file from
+<a href="http://staf.sourceforge.net/getservices.php">Get STAF Services</a>
+and extracting its contents to a local directory (e.g. C:\STAF\services or
+/usr/local/staf/services).
+The STAFHTTP.jar file is the service jar file needed when
+registering the HTTP service.
+<p>
+The HTTP service is an external STAF service written in Java.  Since
+it is an external service, it must be registered with a SERVICE
+configuration statement in the STAF configuration file (or it
+can be dynamically registered using the SERVICE service's <tt>ADD SERVICE</tt>
+request).
+<p>
+The syntax to register the service is:
+<PRE>SERVICE &lt;Service Name&gt; LIBRARY JSTAF EXECUTE &lt;Service Jar File Name&gt;</PRE>
+
+<P><TT>&lt;Service Name&gt;</TT> is the name by which the HTTP service will
+be known on this machine.
+<P><TT>&lt;Service Jar File Name&gt;</TT> is the fully-qualified name of the STAFHTTP.jar file.
+
+<H3>Examples</H3>
+
+<PRE>
+SERVICE Http LIBRARY JSTAF EXECUTE {STAF/Config/STAFRoot}/services/http/STAFHTTP.jar
+SERVICE Http LIBRARY JSTAF EXECUTE C:/STAF/services/http/STAFHTTP.jar
+SERVICE Http LIBRARY JSTAF EXECUTE /usr/local/staf/services/http/STAFHTTP.jar
+</pre>
+
+<H1><A name=Syntax href="#ToC_Syntax">Request Syntax</A> </H1>
+
+<PRE>
+OPEN    SESSION
+CLOSE   SESSION &lt;Session&gt;
+LIST    SESSIONS
+LIST    &lt;FORMS | LINKS | COOKIES | DEFAULTHEADERS | AUTHENTICATIONHOSTS |
+        CONTROLNAMES FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;]&gt;
+        SESSION &lt;Session&gt;
+QUERY   SESSION &lt;Session&gt;
+GET     SESSION &lt;Session&gt; CONTENT [FILE &lt;File Name&gt; [TOMACHINE &lt;Machine&gt;]]
+
+REQUEST METHOD &lt;Http Method&gt; URL &lt;Target Url&gt; [ENCODED] [CONTENT &lt;Content&gt;]
+        [HEADER &lt;Key&gt;=&lt;Value&gt;]... [PARAMETER &lt;Key&gt;=&lt;Value&gt;]...
+        [CONTENTFILE &lt;Key&gt;=&lt;File Name&gt;]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session&gt;]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+DOPOST  URL &lt;Target Url&gt; [ENCODED] [CONTENT &lt;Content&gt;]
+        [HEADER &lt;Key&gt;=&lt;Value&gt;]... [PARAMETER &lt;Key&gt;=&lt;Value&gt;]...
+        [CONTENTFILE &lt;Key&gt;=&lt;File Name&gt;]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session&gt;]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+DOGET   URL &lt;Target Url&gt; [ENCODED] [CONTENT &lt;Content&gt;]
+        [HEADER &lt;Key&gt;=&lt;Value&gt;]... [PARAMETER &lt;Key&gt;=&lt;Value&gt;]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session&gt;]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+
+SET     &lt;FOLLOWREDIRECT | DONOTFOLLOWREDIRECT&gt; SESSION &lt;Session&gt;
+SET     PARSECONTENT &lt;Enabled | Disabled | AutoDetect&gt; SESSION &lt;Session&gt;
+SET     HTTPPROXYHOST &lt;Host&gt; [HTTPPROXPYPORT &lt;Port&gt;] SESSION &lt;Session&gt;
+
+QUERY   AUTHENTICATIONHOST &lt;Host&gt; SESSION &lt;Session&gt;
+SET     AUTHENTICATIONHOST &lt;Host&gt; AUTHENTICATIONUSER &lt;User&gt;
+        [AUTHENTICATIONPASSWORD &lt;Password&gt;] [AUTHENTICATIONDOMAIN &lt;Domain&gt;]
+        SESSION &lt;Session&gt;
+DELETE  AUTHENTICATIONHOST &lt;Host&gt; SESSION &lt;Session&gt;
+
+QUERY   DEFAULTHEADER &lt;Key&gt; SESSION &lt;Session&gt;
+SET     DEFAULTHEADER &lt;Key&gt; VALUE &lt;Value&gt; SESSION &lt;Session&gt;
+DELETE  DEFAULTHEADER &lt;Key&gt; SESSION &lt;Session&gt;
+
+QUERY   COOKIE NAME &lt;Name&gt; SESSION &lt;Session&gt;
+SET     COOKIE &lt;NAME &lt;Name&gt; VALUE &lt;Value&gt;&gt; | &lt;POLICY &lt;policy&gt;&gt;
+        SESSION &lt;Session&gt;
+DELETE  COOKIE NAME &lt;Name&gt; SESSION &lt;Session&gt;
+
+QUERY   FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] [CONTROLNAME &lt;Name&gt;]
+        SESSION &lt;Session&gt;
+SET     FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;]
+        CONTROLNAME &lt;Name&gt; VALUE &lt;Value&gt; SESSION &lt;Session&gt;
+SUBMIT  FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] SESSION &lt;Session&gt;
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+RESET   FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] SESSION &lt;Session&gt;
+
+QUERY   LINK &lt;NAME &lt;Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;&gt; SESSION &lt;Session&gt;
+FOLLOW  LINK &lt;NAME &lt;Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;&gt; SESSION &lt;Session&gt;
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+
+HELP
+
+VERSION</PRE>
+
+<HR>
+<H1><A name=SessMgmt href="#ToC_SessMgmt">Session Management</A> </H1>
+
+<H2><A name=OPEN href="#ToC_OPEN">OPEN SESSION</A></H2>
+<p>
+This command opens a new web session.  It returns the session id of the new session.  
+The owner of the new session is identified by the machine, process, and handle
+used to issue the OPEN command.
+</p>
+
+<H4>Syntax</H4>
+<pre>OPEN    SESSION</pre>
+<p>
+<TT>SESSION</TT>  specifies to open a new session.</p>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain the id of the new session.</p>
+
+<H4>Examples</H4>
+<p>
+<ul>
+<li><b>Goal:</b> Create a new session.
+<p><b>Syntax:</b> <TT>OPEN SESSION</TT>
+</ul>
+
+<H2><A name=CLOSE href="#ToC_CLOSE">CLOSE SESSION</A></H2>
+<P>This command closes a session. This is automatically done when the HTTP
+service is terminated. Once a session is closed it is no longer accessible.
+The session id is recycled for the next <tt>OPEN</tt> request.</P>
+
+<H4>Syntax</H4>
+<PRE>
+CLOSE   SESSION &lt;Session&gt;
+</PRE>
+<P>
+<TT>SESSION</TT> specifies the id of the session to close.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 5 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Close session with id 12.
+<p><b>Syntax:</b> <TT>CLOSE SESSION 12</TT>
+</ul>
+
+<H2><A name=LIST href="#ToC_LIST">LIST SESSIONS</A></H2>
+<P>
+This command will list all the sessions that are currently open.</P>
+
+<H4>Syntax</H4>
+<PRE>LIST    SESSIONS</PRE>
+<p>
+<tt>SESSIONS</tt> specifies to list the sessions that are currently open. 
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled
+<tt>&lt;List> of &lt;Map:STAF/Service/HTTP/ListSession></tt> representing a list
+of the sessions that are currently open.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/ListSession</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents summary information
+for a Http session.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sessionID
+<td>ID
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>url
+<td>Url
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>title
+<td>Title
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "ID" value is set to the ID of the session.
+<li>The "Url" value is set to the url of the current page in the session, or <tt>&lt;None></tt>
+if the session isn't set to a page.
+<li>The "Title" value is set to the title for the current page in the session, or <tt>&lt;None></tt>
+if the page doesn't have one.
+</ol>
+</tr>
+</tfoot>
+</table>
+
+<H4>Examples</H4>
+<p>
+<ul>
+<li><b>Goal:</b> List all sessions.
+<p><b>Syntax:</b> <tt>LIST SESSIONS</tt></P>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in table format,
+could look like: 
+<pre>
+ID Url                          Title
+-- ---------------------------- --------------------------------------------
+1  http://staf.sourceforge.net/ Software Testing Automation Framework (STAF)
+2  http://www.tamu.edu/         Texas A&M University
+3  &lt;None>                       &lt;None>
+</pre>
+</ul>
+
+<H2><A name=QUERY href="#ToC_QUERY">QUERY SESSION</A></H2>
+<P>
+This command returns information regarding a session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+QUERY   SESSION &lt;Session&gt;
+</PRE>
+<P>
+<TT>SESSION</TT> specifies the id of the session to be queried.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled
+<tt>&lt;Map:STAF/Service/HTTP/Session></tt> representing a list
+of the links in the specified page of the specified session.
+The maps are defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/Session</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents detailed information
+for a Http session.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+<tbody>
+<tr>
+<td>url
+<td>Url
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>title
+<td>Title
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>statusCode
+<td>Status Code
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>statusMessage
+<td>Status Message
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>cookiePolicy
+<td>Cookie Policy
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>followsRedirects
+<td>Follows Redirects
+<td><tt>&lt;String> | &lt;None></tt>
+<td><tt>'Enabled' | 'Disabled'</tt>
+<tr>
+<td>parseContent
+<td>Parse Content
+<td><tt>&lt;String> | &lt;None></tt>
+<td><tt>'Enabled' | 'Disabled' | 'AutoDetect'</tt>
+<tr>
+<td>httpProxyHost
+<td>HTTP Proxy Host
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>httpProxyPort
+<td>HTTP Proxy Port
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>owner
+<td>Owner
+<td><tt>&lt;Map>:STAF/Service/HTTP/SessionOwner</tt>
+<td>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Url" value is set to the url of the current page in the session, or <tt>&lt;None></tt>
+if the session isn't set to a page.
+<li>The "Title" value is set to the title for the current page in the session, or <tt>&lt;None></tt>
+if the page doesn't have one.
+<li>The "Status Code" value is set to HTTP status code for the last HTTP request
+made in the session.
+<li>The "Status Message" value is set to HTTP message for the last HTTP request
+mode in the session.
+<li>The "Cookie Policy" value indicates the default cookie policy for the session.
+<li>The "Follows Redirects" value indicates the default behavior for following
+redirects for the session.
+<li>The "Parse Content" value indicates the default behavior for
+parsing the content as HTML for the session.
+<li>The "HTTP Proxy Host" value indicates the HTTP proxy host for the session or
+<tt>&lt;None></tt> if no HTTP proxy host has been set.
+<li>The "HTTP Proxy Port" value indicates the HTTP proxy port for the session or
+<tt>&lt;None></tt> if no HTTP proxy host has been set.
+<li>The "Owner" value is set to a map containing information about the owner of 
+the session (the process that opened the session).
+</ol>
+</tr>
+</tfoot>
+</table>
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/SessionOwner</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents information about
+the owner of a Http session.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+<tbody>
+<tr>
+<td>instanceUUID
+<td>Instance UUID
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>machine
+<td>Machine
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>handleName
+<td>Handle Name
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>handle
+<td>Handle
+<td><tt>&lt;String></tt>
+<td>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Instance UUID" value is set to the STAF instance UUID that opened the session.
+<li>The "Machine" value is set to the machine that opened the session.
+<li>The "Handle Name" value is set to name of the handle of the process that
+opened the session, or <tt>&lt;None></tt> if the process doesn't have a
+handle name.
+<li>The "Handle" value is set to handle number of the process that opened
+the session.
+</ol>
+</tr>
+</tfoot>
+</table>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Link summary information for session 1.
+<p><b>Syntax:</b> <tt>QUERY SESSION 2</tt></P>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Url              : http://staf.sourceforge.net/
+  Title            : Software Testing Automation Framework (STAF)
+  Status Code      : 200
+  Status Message   : Ok
+  Cookie Policy    : rfc2109
+  Follows Redirects: Disabled
+  Parse Content    : AutoDetect
+  HTTP Proxy Host  : &lt;None>
+  HTTP Proxy Port  : &lt;None>
+  Owner            : {
+    Instance UUID: DA232A42E8010000C0A8150175636173 
+    Machine      : client1.austin.ibm.com
+    Handle Name  : STAX/Job/1
+    Handle       : 15
+  }
+}
+</pre>
+</ul>
+
+<H2><A name=SHOW href="#ToC_SHOW">GET SESSION CONTENT</A></H2>
+<P>
+This command returns the content from the last http request or redirection.
+It does not show any changes made to forms in the page through the use
+of the <tt>FORM</tt> commands. This is the content that is visible in the browser.</P>
+
+<H4>Syntax</H4>
+<PRE>
+GET     SESSION &lt;Session&gt; CONTENT [FILE &lt;File Name&gt; [TOMACHINE &lt;Machine&gt;]]
+</PRE>
+<P>
+<TT>SESSION</tt> specifies the id of the session.
+This option will resolve variables.</P>
+<p>
+<tt>CONTENT</tt> specifies to get the content from the last http request or redirection.
+<p>
+<TT>FILE</TT> specifies the fully-qualified name of a file where the response should be stored.
+If the FILE option is not specified, the response will be returned
+in the STAF result buffer.  If an error occurs writing to the file, an error
+will be generated and the response will be returned in the result buffer.
+An error will occur if the parent directory for the file does not exist.
+This option will resolve variables.</P>
+<P>
+<tt>TOMACHINE</tt> specifies the machine where the output file should be stored.
+The output file will be stored on the HTTP service machine if this option is not specified.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher.
+<p>
+Also, if option TOMACHINE is specified, the HTTP service machine requires trust level 4 on
+the target machine in order to copy the file from the HTTP service machine
+to the target machine.
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be a string containing the response body of
+the last request or redirection, unless the <tt>FILE</tt> option is specified.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get the current contents of a session (3).</P>
+<p><b>Syntax:</b> <tt>GET CONTENT SESSION 3</tt>
+<P>
+<li><b>Goal:</b> Store the current contents of a session (3) in a file (c:/temp.html)
+on the HTTP service machine.</P>
+<p><b>Syntax:</b> <tt>GET CONTENT SESSION 3 FILE c:/temp.html</tt>
+<P>
+<li><b>Goal:</b> Store the current contents of a session (1) in a file (/tmp/theContent.html)
+on machine machine1.austin.ibm.com.
+<p><b>Syntax:</b>
+<tt>GET CONTENT SESSION 1 FILE /tmp/theContent.html TOMACHINE machine1.austin.ibm.com</tt>
+</ul>
+
+<H2><A name=REDIRECT href="#ToC_REDIRECT">SET SESSION FOLLOWREDIRECT</A></H2>
+<P>
+This command sets the default behavior for following redirects for a session.
+A possible redirect occurs when an HTTP return code of 3XX is encountered.
+When following redirects is enabled, the HTTP service will follow up to
+100 redirects, after that point it is assumed that an inadvertant infinite
+loop has been entered and return an error.</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET     &lt;FOLLOWREDIRECT | DONOTFOLLOWREDIRECT&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>FOLLOWREDIRECT</tt> specifies the session should attempt to follow any 3XX return codes it
+gets from attempting the request. The contents of the result buffer will
+contain the result of the last redirect followed.</P>
+<P>
+<tt>DONOTFOLLOWREDIRECT</tt> specifies the session should not attempt to follow any 3XX return codes it gets from attempting the request. </P>
+<P>
+<TT>SESSION</tt> specifies the id of the session.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Store the default behavior of session 3 to follow redirects.</P>
+<p><b>Syntax:</b> <tt>SET FOLLOWREDIRECT SESSION 3</tt>
+<P>
+<li><b>Goal:</b> Store the default behavior of session 3 to not follow redirects.</P>
+<p><b>Syntax:</b> <tt>SET DONOTFOLLOWREDIRECT SESSION 3</tt>
+</ul>
+
+<H2><A name=PARSECONTENT href="#ToC_PARSECONTENT">SET SESSION PARSECONTENT</A></H2>
+<P>
+This command sets the default behavior for whether to parse the contents for
+a session as HTML.  Parsing the content as HTML means that the HTTP service
+will scan/parse all the HTML tags in the content gathering information that
+allows you to submit additional requests to list/query links and/or forms in
+the HTML content.  For performance/memory-usage reasons, this parsing should
+only be done when the content is an HTML document (not when the content is
+binary data, etc).
+</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET     PARSECONTENT &lt;Enabled | Disabled | AutoDetect&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>PARSECONTENT</tt> specifies whether the session should parse
+new content it gets (e.g. on a DOGET request) as HTML.  
+This option will resolve variables.
+The valid values (case-insensitive) that can be specified are:
+<ul>
+<li><tt>Enabled</tt> - specifies to always parse the content as HTML in this session
+    (even if the content is not an HTML document).
+<li><tt>Disabled</tt> - specifies to never parse the content as HTML in this session
+    (even if the content is an HTML document).
+<li><tt>AutoDetect</tt> - specifies to parse the content based on the "Content-Type"
+header returned by the web server.  Only if the "Content-Type" contains "text/html"
+will the content will be parsed as HTML.  Note that web servers are often
+configured to determine the content type based on the file extension such
+that files with a .html or .htm extension are considered to have content
+type "text/html".  This is the default setting.
+</ul>
+</P>
+<P>
+<TT>SESSION</tt> specifies the id of the session.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Set the default behavior of session 1 to parse the
+content as HTML based on the "Content-Type" header returned by the
+web server.</P>
+<p><b>Syntax:</b> <tt>SET PARSECONTENT AutoDetect SESSION 1</tt></p>
+<P>
+<li><b>Goal:</b> Set the default behavior of session 3 to never parse
+the content as HTML.</P>
+<p><b>Syntax:</b> <tt>SET PARSECONTENT Disabled SESSION 3</tt></p>
+<P>
+<li><b>Goal:</b> Set the default behavior of session 3 to always parse
+the content as HTML.</P>
+<p><b>Syntax:</b> <tt>SET PARSECONTENT Enabled SESSION 3</tt></p>
+</ul>
+
+<H2><A name=HTTPPROXY href="#ToC_HTTPPROXY">SET SESSION HTTPPROXYHOST</A></H2>
+<P>
+This command sets an HTTP proxy server for a session.
+A proxy server is a server that acts as an intermediary for requests from clients
+seeking resources from other servers.
+</p>
+<p>
+Once a HTTP proxy server has been set for a session, you can change its
+settings but you cannot change it back to not using a HTTP proxy server
+for the rest of the session.
+</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET HTTPPROXYHOST &lt;Host&gt; [HTTPPROXYPORT &lt;Port&gt;] SESSION &lt;Session&gt;
+
+</PRE>
+<P>
+<tt>HTTPPROXYHOST</tt> specifies the host name or IP address of the
+HTTP proxy server that you want to use for the session.
+This option will resolve variables.
+</P>
+<P>
+<tt>HTTPPROXYPORT</tt> specifies the port for the HTTP proxy server.
+It defaults to -1 which indicates to use the default port.
+Valid values are -1 to 65535.
+This option will resolve variables.
+</P>
+<P>
+<TT>SESSION</tt> specifies the id of the session.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Set the HTTP proxy host for session 1 to my.proxy.com
+using the default port.</P>
+<p><b>Syntax:</b> <tt>SET HTTPPROXYHOST my.proxy.com SESSION 1</tt></p>
+<P>
+<li><b>Goal:</b> Set the HTTP proxy host for session 3 to rollysproxy.info
+using port 80.</P>
+<p><b>Syntax:</b> <tt>SET HTTPPROXYHOST rollysproxy.info HTTPPROXYHOST 80 SESSION 3</tt></p>
+</ul>
+
+<HR>
+<H1><A name=ReqMgmt href="#ToC_ReqMgmt">Request Management</A> </H1>
+
+<H2><A name=Request href="#ToC_5">REQUEST</A></H2>
+<P>
+Generates and sends an HTTP request. Then
+returns the HTTP response in a variety of
+formats.</P>
+
+<H4>Syntax</H4>
+
+<PRE>
+REQUEST METHOD &lt;Http Method&gt; URL &lt;Target Url&gt; [ENCODED] [CONTENT &lt;Content&gt;]
+        [HEADER &lt;Key&gt;=&lt;Value&gt;]... [PARAMETER &lt;Key&gt;=&lt;Value&gt;]...
+        [CONTENTFILE &lt;Key&gt;=&lt;File Name&gt;]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session&gt;]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+</PRE>
+<P>
+<tt>METHOD</tt> specifies the HTTP method to be used in this request. This may be any
+of GET, POST, PUT, HEAD, OPTIONS, DELETE, or TRACE.
+This option will resolve variables.</P>
+<P>
+<tt>URL</tt> specifies the host, port, and uri which should be used as the
+URL for this HTTP request. This should be of the format:
+<pre>
+ [protocol://][host][:port]/uri
+</pre>
+The supported protocols are http and https.
+Note that http is the default if protocol is not specified.
+This option will resolve variables.
+<p>
+<tt>ENCODED</tt> specifies that the URL is already in an escaped-encoded
+(aka percent-encoded) form.  If not specified, the URL is assumed to not be in
+an escaped-encoded form and URL encoding will be performed implicitly.
+This option is optional.
+Note that escaped-encoded means that the URL is using encoded sequences with format
+<tt>%&lt;Hex>&lt;Hex></tt> to represesent certain characters in the URL (e.g. %20
+instead of a space, %26 instead of a &, %25 instead of a %, etc).
+<P>
+<tt>CONTENT</tt> specifies the content-body which should be sent with this request.
+This parameter will be ignored for GET, HEAD, OPTIONS, DELETE, or TRACE
+methods. This parameter is optional.
+This option will resolve variables using the IGNOREERRORS option when submitting
+a VAR RESOLVE request.</P>
+<P>
+<tt>HEADER</tt> may be specified to include HTTP Headers
+in the request. The headers should be specified
+as key value pairs in the form key=value.
+This parameter is optional.
+This parameter may be specified more than once to set multiple headers.
+This option will resolve variables.
+<blockquote>
+The following headers will be set by default:
+<pre>
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: &lt;host_url>
+</pre>
+<!-- Commented out because these headers are not always set (e.g. Content-length is
+     not set if Transfer-Encoding is "chunked"). Also, sometimes the Content-type
+     header is not set.
+The following headers will be set if content
+was specified and the method is either PUT
+or POST:
+<pre>
+Content-type: application/x-www-form-urlencoded
+Content-length: &lt;length&gt;
+</pre>
+-->
+These headers may be overridden by specifying different values.
+</blockquote>
+<P>
+<tt>PARAMETER</tt> may be specified to include parameters in a request. The parameters should
+be specified as key value pairs in the form Parameter Name=Value. This
+option may be specified more than once to set multiple parameters.
+Only GET and POST requests can specify parameters. If this option is specified,
+<tt>CONTENT</tt> is ignored.
+This option will resolve variables.  This option will handle private data
+in the <tt>Value</tt> specified for the parameter.</P>
+<P><tt>CONTENTFILE</tt> may be specified to include files in a request. The parameters should
+be specified as key value pairs in the form Parameter Name=File Name. This
+option may be specified more than once to set multiple files. Only POST
+requests can specify parameters. If this option is specified the service
+will attempt a multipart post using a binary file transfer. If this option
+is specified <tt>CONTENT</tt> is ignored.
+This option will resolve variables.
+</P>
+<P><tt>SESSION</tt> specifies the id of the session to perform the request on.
+This option will resolve variables.</P>
+<P><tt>FOLLOWREDIRECT</tt> specifies the session should attempt to follow any 3XX return codes it
+gets from attempting the request. This is a recursive process and will
+follow up to 100 redirects. This option will override the session setting.
+The contents of the result buffer will contain the result of the last redirect
+followed.</P>
+<P><tt>DONOTFOLLOWREDIRECT</tt> specifies the session should not attempt to follow any 3XX return codes it gets from attempting the request. This option will override the session setting.</P>
+<P><tt>FILE</tt> specifies the fully-qualified name of a file where the response should be stored.
+If the <tt>FILE</tt> parameter is not specified, the response will be returned
+in the STAF result buffer. If an error occurs writing to the file, an error
+will be generated and the response will be returned in the result buffer.
+An error will occur if the parent directory for the file does not exist.
+This option will resolve variables.</P>
+<P><tt>TOMACHINE</tt> specifies the machine that should be used to store the outputfile.
+The output file will be stored on the HTTP service machine if this option is not specified.
+This option will resolve variables.</P>
+<P><tt>IGNOREERRORS</tt> may be specified to indicate that HTTP client and server errors
+(HTTP status codes of 4XX and 5XX) should be ignored. The default is to
+return a non-zero STAF return code when an HTTP error is encountered. If
+this option is specified and an error occurs, the command will return a
+0 code. However, the status code will still be returned, unless disabled.
+See the <a href="#return codes">Return Codes</a> section below
+for more information.</P>
+
+<P><tt>NOSTATUS</tt> may be specified to indicate that the HTTP response code and HTTP
+response message should not be returned in the result. Default is to include
+both of these values in the output.</P>
+
+<P><tt>RETURNHEADERS</tt> may be specified to indicate that all HTTP headers in the
+HTTP response should be returned with the result. Default is to not include
+headers in the output.</P>
+
+<P><tt>RETURNNOCONTENT</tt> may be specified to indicate that the HTTP response body should
+not be returned in the result. Default is to include it in the output.</P>
+
+<H4><A NAME="Header_17">Security</A></H4>
+<P>
+if option <tt>SESSION</tt> is not specified, this command requires
+trust level 3 or higher.
+<p>
+If option <tt>SESSION</tt> is specified, this command requires
+trust level 3 or higher for the session owner or requires trust level
+4 for non-session owners.</P>
+<p>
+Also, if option TOMACHINE is specified, the HTTP service machine requires
+trust level 4 on the target machine in order to copy the file from the
+HTTP service machine to the target machine.
+
+<H4><A name="return codes">Return Codes</A></H4>
+<P>
+If an HTTP Client or Server error occurs (HTTP Status code of 4XX or 5XX) and IGNOREERRORS was not 
+specified, then the STAF return code will be 4000 plus the HTTP status code. For example, if the 
+response had a status code of 501 the STAF return code would be 4501. All other return codes from 
+<tt>REQUEST</tt> are documented in <A href="#Errors">&quot;HTTP Error Code Reference&quot;</A>.</P>
+<P><a name="REQUEST Results"></a></P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a
+marshalled <font face="Courier New,Courier"><font size=-1>
+&lt;Map:STAF/Service/HTTP/HttpResultMapClass></font></font> representing the
+output of the HTTP response upon completion.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/HttpResultMapClass</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents the output of the
+HTTP response upon completion.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>statusCode
+<td>Status Code
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>statusMessage
+<td>Status Message
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>headers
+<td>Headers
+<td><tt>&lt;Map> | &lt;None></tt>
+<tr>
+<td>content
+<td>Content
+<td><tt>&lt;String> | &lt;None></tt>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Status Code" value is set to HTTP status code from the HTTP response,
+or <tt>&lt;None></tt> if <tt>NOSTATUS</tt> was specified in the request.
+<li>The "Status Message" value is set to the HTTP status message from the
+HTTP response, or <tt>&lt;None></tt> if no message was provided or if
+<tt>NOSTATUS</tt> was specified in the request.
+<li>The "Headers" value is set to a map containing all the HTTP headers in the
+HTTP response, or <tt>&lt;None></tt> if <tt>RETURNHEADERS</tt> was not specified
+in the request.
+<li>The "Content" value is set to the HTTP response body, or <tt>&lt;None></tt>
+if <tt>RETURNNOCONTENT</tt> was specified in the request.
+</ol>
+</tr>
+</tfoot>
+</table>
+<P>
+If the FILE parameter is specified, the "Content" value will be written to the file
+instead of the result buffer (the "Content" value will be <tt>&lt;None></tt> in
+the result buffer).
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Perform a get on the Amazon website (which is permanently redirected).
+<p><b>Syntax:</b> <tt>REQUEST METHOD get URL http://www.amazon.com FOLLOWREDIRECT RETURNNOCONTENT</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like:
+<pre>
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<p>
+<li><b>Goal:</b> Get the HTTP options available in a request to the STAF SourceForge website.
+<p><b>Syntax:</b> <tt>REQUEST METHOD options URL http://staf.sourceforge.net RETURNHEADERS</TT>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Status Code   : 200
+  Status Message: OK
+  Headers       : {
+    Allow         : GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, PATCH, PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK, TRACE
+    Connection    : close
+    Content-Length: 0
+    Date          : Thu, 03 Apr 2008 19:13:16 GMT
+    Server        : Apache/1.3.33 (Unix) PHP/4.3.10
+    X-Pad         : avoid browser bug
+  }
+  Content       :
+}</pre>
+<P>
+<li><b>Goal:</b> Test a multipart post script with 3 files and 2 additional parameters
+on the local machine.
+<P><b>Syntax:</b>
+<p><tt>REQUEST METHOD post CONTENTFILE file1=c:\test.txt CONTENTFILE file2=c:\test.jpg
+ CONTENTFILE file3=c:\test.exe PARAMETER foo=bar PARAMETER foo=goo URL 
+http://localhost:8080/multi-file-test.pl RETURNNOCONTENT</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<P>
+<li><b>Goal:</b> Test a post script with a single text file as the content body.
+<p><b>Syntax:</b>
+<p><tt>REQUEST METHOD post URL http://localhost:8080/text-file-test.pl HEADER content-type=text
+CONTENT &lt;file contents&gt; RETURNNOCONTENT</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<P>
+<li><b>Goal:</b> Perform a trace to verify a test site is active.
+<p><b>Syntax:</b> <tt>REQUEST METHOD trace URL http://www.sourceforge.net</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+Host: staf.sourceforge.net
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+<p>
+<li><b>Goal:</b> Using a session, login to a secure website (e.g. SourceForge) and
+go to a personal homepage.  Use privacy delimiters to protect the password.
+<p><b>Syntax:</b>
+<p><tt>OPEN SESSION<br>
+&nbsp;<br>
+REQUEST METHOD post URL http://sourceforge.net/account/login.php PARAMETER form_loginname=user
+PARAMETER form_pw=!!@password@!! PARAMETER login=Login+With+SSL SESSION 1 RETURNNOCONTENT<BR>
+&nbsp;<br>
+REQUEST METHOD get URL https://sourceforge.net/my/ RETURNNOCONTENT SESSION 1</tt></p>
+<p><b>Result:</b>
+If the REQUEST requests are submitted from the command line, the results, in the default format,
+could look like: 
+<pre>
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<p>
+<li><b>Goal:</b> Perform a get on a website "<tt>http://www.mywebsite.com/test/A&amp;M Test</tt>"
+using an escaped-encoded URL:
+<p><b>Syntax:</b> <tt>REQUEST METHOD get URL http://www.mywebsite.com/test/A%26M%25Test
+</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like:
+<pre>
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+</ul>
+
+<H2><A name="DoPost" href="#ToC_6">DOPOST</A></H2>
+<P>
+A <tt>DOPOST</tt> command is identical to a <tt>REQUEST METHOD post</tt> command.
+For example, the following two commands are identical:</p>
+<ul>
+<pre>
+REQUEST METHOD post URL http://www.htmlcodetutorial.com/cgi-bin/mycgi.pl CONTENT john=doe
+
+DOPOST URL http://www.htmlcodetutorial.com/cgi-bin/mycgi.pl CONTENT john=doe
+</pre>
+</ul>
+
+<H2><A name="DoGet" href="#ToC_7">DOGET</A></H2>
+<P>
+A <tt>DOGET</tt> command is identical to a <tt>REQUEST METHOD get</tt> command, except that
+<TT>CONTENTFILES</tt> is not allowed.
+For example, the following two commands are identical:</p>
+<ul>
+<pre>
+REQUEST METHOD get URL http://amazon.com FOLLOWREDIRECT RETURNNOCONTENT
+
+DOGET URL http://amazon.com FOLLOWREDIRECT RETURNNOCONTENT
+</pre>
+</ul>
+
+<HR>
+<H1><A name=AUTHENTICATION href="#ToC_AUTHENTICATION">Preemptive Authentication Management</A> </H1>
+
+<H2><A name=AUTHENTICATION_LIST href="#ToC_AUTHENTICATION">LIST AUTHENTICATIONHOSTS</A></H2>
+<P>
+This command lists all the authentication hosts in the current page of the
+specified session.
+When directed to a secure site that exists on a host in the authentication
+hosts list, the HTTP service will preemptively attempt to authenticate
+a secure session with the site using the user and password associated with
+the host. The HTTP service supports Basic, Digest, and NTLM authentication
+schemes.</P>
+
+<H4>Syntax</H4>
+<PRE>
+LIST    AUTHENTICATIONHOSTS SESSION &lt;Session&gt;
+</PRE>
+<p>
+<tt>AUTHENTICATIONHOSTS</tt> specifies to list all the authentication hosts
+in the current page of the specified session.
+<P>
+<tt>SESSION</tt> specifies the id of the session with the authentication enabled
+hosts.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled <tt>&lt;List></tt>
+of <tt>&lt;String></tt> representing the authentication enabled hosts in the session.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get a list of authentication enabled hosts present in session 3.</P>
+<P><b>Syntax:</b> <tt>LIST AUTHENTICATIONHOSTS SESSION 3 </tt></P>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+www.mysite.com
+www.mysite2.com
+</pre>
+</ul>
+
+<H2><A name=AUTHENTICATION_QUERY href="#ToC_AUTHENTICATION">QUERY AUTHENTICATIONHOST</A></H2>
+<P>
+This command provides information about a specific authentication host.
+When directed to a secure site that exists on a host in the authentication hosts
+list, the HTTP service will preemptively attempt to authenticate a secure session
+with the site using the user and password associated with the host.
+The HTTP service supports Basic, Digest, and NTLM authentication schemes.</P>
+
+<H4>Syntax</H4>
+<PRE>
+QUERY   AUTHENTICATIONHOST &lt;Host&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>AUTHENTICATIONHOST</tt> specifies the host to get information about.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the authentication enabled
+hosts.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled
+<font face="Courier New,Courier"><font size=-1>
+&lt;Map:STAF/Service/HTTP/AuthenticationHost></font></font>
+representing the specified authentication enabled host in the session.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/AuthenticationHost</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents an authentication
+enabled host.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user
+<td>User ID
+<td><font face="Courier New,Courier"><font size=-1>&lt;String></font></font>
+<td>
+<tr>
+<td>password
+<td>Password
+<td><font face="Courier New,Courier"><font size=-1>&lt;String> | &lt;None></font></font>
+<td>This data will be masked.
+<tr>
+<td>domain
+<td>Domain
+<td><font face="Courier New,Courier"><font size=-1>&lt;String> | &lt;None></font></font>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Password" value will be displayed as <tt>*******</tt> if a password was
+specified for the authentication host.  Otherwise, the "Password" value is set to
+<tt>&lt;None></tt> if no password was specified.
+<li>The "Domain" value is set to
+<font face="Courier New,Courier"><font size=-1>&lt;None></font></font> if a domain
+was specified for the authentication host.
+</ol>
+</tr>
+</tfoot>
+</table>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get the information about a authentication enabled host, www.mysite.com,
+in session 1.</P>
+<P><b>Syntax:</b> <tt>QUERY AUTHENTICATIONHOST www.mysite.com SESSION 1</tt></P>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+User     : admin
+Password : *******
+Domain   : &lt;None>
+</pre>
+</ul>
+
+<H2><A name=AUTHENTICATION_SET href="#ToC_AUTHENTICATION">SET AUTHENTICATIONHOST</A></H2>
+<P>
+This command set the user and password of a authentication enabled host
+in the specified session. If the host is not in the authentication list,
+it will be added to the list. If it is in the list, the current values
+will be replaced. <BR>
+The HTTP service supports Basic, Digest, and NTLM authentication schemes.
+<p>
+<b>Warning:</b> STAF does not encrypt its TCP communication, so the password will be sent
+in the clear to another STAF machine.</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET     AUTHENTICATIONHOST &lt;Host&gt; AUTHENTICATIONUSER &lt;User&gt;
+        [AUTHENTICATIONPASSWORD &lt;Password&gt;] [AUTHENTICATIONDOMAIN &lt;Domain&gt;] 
+        SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>AUTHENTICATIONHOST</tt> specifies the host to be manipulated.
+This option will resolve variables.</P>
+<P>
+<tt>AUTHENTICATIONUSER</tt> specifies the user to be associated with the host.
+This option will resolve variables.</P>
+<P>
+<tt>AUTHENTICATIONPASSWORD</tt> specifies the password to be associated with the host.
+This option will resolve variables.  This option will handle private data.</P>
+<P>
+<tt>AUTHENTICATIONDOMAIN</tt> specifies the domain to be associated with the host. This is only used
+for NTLM authentication.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the authentication enabled
+host.  This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Set the values of the authentication enabled host www.mysite.com
+in session 3 to user Bob and password myCat and use privacy delimiters
+to protect the password.</P>
+<P><b>Syntax:</b> <tt>SET AUTHENTICATIONHOST www.mysite.com AUTHENTICATIONUSER Bob AUTHENTICATIONPASSWORD !!@myCat@!! SESSION 3</tt>
+<P>
+<li><b>Goal:</b> Add a new authentication enabled host www.mysite.com in session 1
+with user admin and no password.</P>
+<P><b>Syntax:</b> <tt>SET AUTHENTICATIONHOST www.mysite.com AUTHENTICATIONUSER admin SESSION 1</tt>
+</ul>
+
+<H2><A name=AUTHENTICATION_DELETE href="#ToC_AUTHENTICATION">DELETE AUTHENTICATIONHOST</A></H2>
+<P>
+This command removes a authentication enabled host from the specified session</P>
+
+<H4>Syntax</H4>
+<PRE>
+DELETE  AUTHENTICATIONHOST &lt;Host&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>AUTHENTICATIONHOST</tt> specifies the name of the authenticated host to be removed.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the authentication enabled
+host.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Remove the authentication enabled host, www.myhost.com from session 3
+<P><b>Syntax:</b> <tt>DELETE AUTHENTICATIONHOST www.myhost.com SESSION 3</tt>
+</ul>
+
+<HR>
+<H1><A name=DEFAULTHEADER href="#ToC_DEFAULTHEADER">Default Header Management</A> </H1>
+
+<H2><A name=DEFAULTHEADER_LIST href="#ToC_DEFAULTHEADER">LIST DEFAULTHEADERS</A></H2>
+<P>
+This command lists all the default headers in the specified session</P>
+
+<H4>Syntax</H4>
+<PRE>
+LIST    DEFAULTHEADERS SESSION &lt;Session&gt;
+</PRE>
+<p>
+<tt>DEFAULTHEADERS</tt> specifies to list all the default headers in the specified session.
+<P>
+<tt>SESSION</tt> specifies the id of the session with the default headers.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a <tt>&lt;Map></tt>
+representing the default header keys/values in the session.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get a list of default headers present in session 3.</P>
+<p><b>Syntax:</b> <tt>LIST DEFAULTHEADERS SESSION 3 </tt></P>
+<p><b>Result:</b> 
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+job    : test
+user-id: Bob
+</pre>
+</ul>
+
+<H2><A name=DEFAULTHEADER_QUERY href="#ToC_DEFAULTHEADER">QUERY DEFAULTHEADER</A></H2>
+<P>
+This command provides the value for a specific default header in the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+QUERY   DEFAULTHEADER &lt;Key&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>DEFAULTHEADER</tt> specifies the key of the default header about which to get information.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the default header.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain the value for the specified default
+header key.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get the information about a default header with key user-id in session 3.</P>
+<P><b>Syntax:</b> <tt>QUERY DEFAULTHEADER user-id SESSION 3</tt></P>
+<p><b>Result:</b> <tt>Bob</tt>
+</ul>
+
+<H2><A name=DEFAULTHEADER_SET href="#ToC_DEFAULTHEADER">SET DEFAULTHEADER</A></H2>
+<P>
+This command sets the value of a default header in the specified session.
+If the specified default header does not exist, a new default header will be
+created and added to the session. If the default header does exist,
+the current value will be overwritten</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET     DEFAULTHEADER &lt;Key&gt; VALUE &lt;Value&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>DEFAULTHEADER</tt> specifies the key of the default header to be manipulated.
+This option will resolve variables.</P>
+<P>
+<tt>VALUE</tt> specifies that the new value of the default header.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the default header.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Set the value of the default header with key user-id in session 3
+to tester.
+<P><b>Syntax:</b> <tt>SET DEFAULTHEADER user-id VALUE tester SESSION 3</tt>
+<P>
+<li><b>Goal:</b> Add a new default header with key job with a value of test to session 3.
+<p><b>Syntax:</b> <tt>SET DEFAULTHEADER job VALUE test SESSION 3</tt>
+</ul>
+
+<H2><A name=DEFAULTHEADER_DELETE href="#ToC_DEFAULTHEADER">DELETE DEFAULTHEADER</A></H2>
+<P>
+This command removes a default headers from the specified session</P>
+
+<H4>Syntax</H4>
+<PRE>
+DELETE  DEFAULTHEADER &lt;Key&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>DEFAULTHEADER</tt> specifies the name of the default header to be removed.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the default header.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Remove the default header with key job from session 3
+<P><b>Syntax:</b> <tt>DELETE DEFAULTHEADER job SESSION 3</tt>
+</ul>
+
+<HR>
+<H1><A name=COOKIE href="#ToC_COOKIE">Cookie Management</A> </H1>
+
+<H2><A name=COOKIE_LIST href="#ToC_COOKIE">LIST COOKIES</A></H2>
+<P>
+This command lists all cookies in the specified session</P>
+
+<H4>Syntax</H4>
+<PRE>
+LIST    COOKIES SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>COOKIES</tt> specifies to list all cookies in the specified session.
+<p>
+<tt>SESSION</tt> specifies the id of the session with the cookies.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a <tt>&lt;List></tt> of <tt>&lt;String></tt>
+representing the cookies in the session.
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get a list of cookies present in session 3.</P>
+<P><b>Syntax:</b> <tt>LIST COOKIES SESSION 3 </tt></P>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+session-id-time
+session-id
+obidos_path_continue-shopping
+ubid-main
+</pre>
+</ul>
+
+<H2><A name=COOKIE_QUERY href="#ToC_COOKIE">QUERY COOKIE</A></H2>
+<P>
+This command provides information about a specific cookie.</P>
+
+<H4>Syntax</H4>
+<PRE>
+QUERY   COOKIE NAME &lt;Name&gt; SESSION &lt;Session&gt;
+</PRE>
+<p>
+<tt>COOKIE</tt> specifies to query a cookie.
+<P>
+<tt>NAME</tt> specifies the name of the cookie to be manipulated.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the cookie.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled
+<font face="Courier New,Courier"><font size=-1>
+&lt;Map:STAF/Service/HTTP/Cookie></font></font>
+representing the specified cookie in the session.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/Cookie</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents a cookie.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>value
+<td>Cookie Value
+<td><font face="Courier New,Courier"><font size=-1>&lt;String></font></font>
+<td>
+<tr>
+<td>domain
+<td>Domain
+<td><font face="Courier New,Courier"><font size=-1>&lt;String> | &lt;None></font></font>
+<td>
+<tr>
+<td>path
+<td>Path
+<td><font face="Courier New,Courier"><font size=-1>&lt;String> | &lt;None></font></font>
+<tr>
+<td>expirationDate
+<td>Expiration Date
+<td><font face="Courier New,Courier"><font size=-1>&lt;String> | &lt;None></font></font>
+</tbody>
+</table>
+
+<H4>Examples</H4>
+<p>
+<ul>
+<li><b>Goal:</b> Get the information about a cookie named session-id in session 1.</P>
+<P><b>Syntax:</b> <tt>QUERY COOKIE NAME session-id SESSION 1</tt></P>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Value          : 104-4977587-2732748
+Domain         : .amazon.com
+Path           : /
+Expiration Date: Fri Aug 27 03:00:00 CDT 2004
+</pre>
+</ul>
+
+<H2><A name=COOKIE_SET href="#ToC_COOKIE">SET COOKIE</A></H2>
+<P>
+This command sets the value of a cookie in the specified session</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET     COOKIE &lt;NAME &lt;Name&gt; VALUE &lt;Value&gt;&gt; | &lt;POLICY &lt;policy&gt;&gt;
+        SESSION &lt;Session&gt;
+</PRE>
+<tt>COOKIE</tt> specifies to set the value of a cookie.
+<P>
+<tt>NAME</tt> specifies the name of the cookie to be manipulated.
+This option will resolve variables.</P>
+<P>
+<tt>VALUE</tt> specifies that the new value of the cookie. If the named cookie does not
+exist, a new cookie will be created and added to the session.
+This option will resolve variables.</P>
+<P>
+<tt>POLICY</tt> specifies a new cookie policy for the session. Valid policy's are NETSCAPE,
+RFC2109, COMPATIBILITY, and IGNORE. The specification of any other policy
+will invoke HttpClient's default cookie policy, RFC2109. For more information
+on cookie policies see <A href="http://jakarta.apache.org/commons/httpclient/cookies.html">Http Client</A> cookie information.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the cookie.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>
+Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Set the cookie handling policy to follow netscape's guidelines.
+<P><b>Syntax:</b> <tt>SET COOKIE SESSION 3 POLICY Netscape</tt>
+<P>
+<li><b>Goal:</b> Set the value of the cookie named user-id in session 3 to tester.
+<p><b>Syntax:</b> <tt>SET COOKIE SESSION 3 NAME user-id VALUE tester</tt>
+<P>
+<li><b>Goal:</b> Add a new cookie named job with a value of test to session 3.
+<p><b>Syntax:</b> <tt>SET COOKIE SESSION 3 NAME job VALUE test</tt>
+</ul>
+
+<H2><A name=COOKIE_DELETE href="#ToC_COOKIE">DELETE COOKIE</A></H2>
+<P>
+This command removes a cookie from the specified session</P>
+
+<H4>Syntax</H4>
+<PRE>DELETE  COOKIE NAME &lt;Name&gt; SESSION &lt;Session&gt;</PRE>
+<tt>COOKIE</tt> specifies to remove a cookie.
+<P>
+<tt>NAME</tt> specifies the name of the cookie to be manipulated.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session with the cookie.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Remove the cookie named job from session 3
+<p><b>Syntax:</b> <tt>DELETE COOKIE SESSION 3 NAME job</tt>
+</ul>
+
+<HR>
+<H1><A name=FORM href="#ToC_FORM">Form Management</A> </H1>
+
+<H2><A name=FORM_LIST href="#ToC_FORM">LIST FORMS</A></H2>
+<P>
+This command provides a list of the form elements in the current page of the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+LIST    FORMS SESSION &lt;Session&gt;
+</PRE>
+<tt>FORMS</tt> specifies to list all the form elements in the current page of the specified session.
+<P>
+<tt>SESSION</tt> specifies the id of the session containing the form.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled
+<tt>&lt;List> of &lt;Map:STAF/Service/HTTP/ListForm></tt> representing a list
+of the forms for the specified page.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/ListForm</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents summary information for a form.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>formIndex
+<td>Index
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>formID
+<td>Form ID
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>formName
+<td>Form Name
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Index" value is set to index of the form.
+<li>The "Form ID" value is set to the Id attribute for the form, or <tt>&lt;None></tt>
+if the form doesn't have one.
+<li>The "Form Name" value is set to the name attribute for the form, or <tt>&lt;None></tt>
+if the form doesn't have one.
+</ol>
+</tr>
+</tfoot>
+</table>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get a list of forms in session 3
+<p><b>Syntax:</b> <tt>LIST FORMS SESSION 3</tt>
+<p><b>Results:</b>
+If the request is submitted from the command line, the result, in the table format,
+could look like: 
+<pre>
+Index Form ID     Form Name
+----- ----------- ---------
+1     GET_FORM    The Get Form
+2     POST_FORM   The Post Form
+3     POST_FORM_2 &lt;None>
+</pre>
+</ul>
+
+<H2><A name=FORM_CONTROLS_LIST href="#ToC_FORM">LIST FORM CONTROLNAMES</A></H2>
+<P>
+This command provides a list of the form control elements of the specified
+form in the current page of the specified session.</P>
+<H4>Syntax</H4>
+<PRE>
+LIST    CONTROLNAMES FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] SESSION &lt;Session Id&gt;
+</PRE>
+<tt>CONTROLNAMES</tt> specifies to list the names of the form control elements of the specified form.
+<p>
+<tt>FORM</tt> specifies to list form control elements.
+<P><tt>NAME</tt> identifies the name attribute to use to specify the form. If more than
+one form has the same name, the first form with the specified name will be selected.
+This option will resolve variables.</P>
+<P><tt>ID</tt> identifies the id attribute to use to specify the form. If more than
+one form has the same name, the first form with the specified id attribute will be selected.
+This option will resolve variables.</P>
+<P><tt>INDEX</tt> identifies the index of the form to be selected in the list of forms
+in the current page. This is a 1-based index. If no form is identified,
+the form at index 1 is selected.
+This option will resolve variables.</P>
+<P><tt>SESSION</tt> specifies the id of the session containing the form.
+This option will resolve variables.</P>
+<p>
+If neither <tt>NAME</tt>, <tt>ID</tt>, or <tt>INDEX</tt> is specified,
+it defaults to the first form.
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a <tt>&lt;List> of &lt;String></tt>
+representing a list of the form control names for the specified form on the specified page.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get a list of form controls in the first form in session 3</P>
+<p><b>Syntax:</b>
+<pre>
+LIST CONTROLNAMES FORM INDEX 1 SESSION 3
+or
+LIST CONTROLNAMES FORM SESSION 3
+</pre>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+submit
+town
+</pre>
+<P>
+<li><b>Goal:</b> Get a list of form controls in the form whose id is GET_FORM in session 1</P>
+<p><b>Syntax:</b> <tt>LIST CONTROLNAMES FORM ID GET_FORM SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+animal
+submit
+who
+</pre>
+<p>
+<li><b>Goal:</b> Get a list of form controls in the form whose name attribute is "The Get Form" in session 2</P>
+<p><b>Syntax</b> <tt>LIST CONTROLNAMES FORM NAME "The Get Form" SESSION 2</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+select
+text1
+</pre>
+</ul>
+
+<H2><A name=FORM_QUERY href="#ToC_FORM">QUERY FORM</A></H2>
+<P>
+This command provides information about the specified form in the current
+page of the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+QUERY   FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] [CONTROLNAME &lt;Name&gt;]
+        SESSION &lt;Session&gt;
+</PRE>
+<tt>FORM</tt> specifies to query a form in current page of the specified session.
+<P>
+<tt>NAME</tt> identifies the name attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>ID</tt> identifies the id attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>INDEX</tt> identifies the index of the form to be selected in the list of forms
+in the current page. This is a 1-based index.
+If no form is identified, the form at index 1 is selected.
+This option will resolve variables.</P>
+<P>
+<tt>CONTROLNAME</tt> identifies the form control to provide information about instead
+of the form in general.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session containing the form.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain information about the specified form
+based on the options specified.</P>
+<p>
+<ul>
+<li>If the CONTROLNAME option is not specified, the result buffer will contain a
+marshalled <font face="Courier New,Courier"><font size=-1>
+&lt;Map:STAF/Service/HTTP/Form></font></font> representing the specified form
+in the session.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/Form</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents a form.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>formIndex
+<td>Index
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>formID
+<td>Form ID
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>formName
+<td>Form Name
+<td><tt>&lt;String> | &lt;None></tt>
+<tr>
+<td>method
+<td>Method
+<td><tt>&lt;String> | &lt;None></tt>
+<tr>
+<td>targetUrl
+<td>Action
+<td><tt>&lt;String> | &lt;None></tt>
+<tr>
+<td>headerMap
+<td>Headers
+<td><tt>&lt;Map> containing header keys/values</tt>
+</tbody>
+</table>
+<P>
+<li>If the CONTROLNAME option is specified, the result buffer will contain a
+marshalled <font face="Courier New,Courier"><font size=-1>
+&lt;Map:STAF/Service/HTTP/FormControlName></font></font> representing the
+specified form control in the session.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/FormControlName</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents a form control.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type
+<td>Type
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>disabled
+<td>Disabled
+<td><tt>&lt;String> | &lt;None></tt>
+<td><tt>'Yes' | 'No'</tt>
+<tr>
+<td>readOnly
+<td>Read Only
+<td><tt>&lt;String> | &lt;None></tt>
+<td><tt>'Yes' | 'No'</tt>
+<tr>
+<td>value
+<td>Value
+<td><tt>&lt;String> | &lt;None></tt>
+<td>Private data will be masked.
+<tr>
+<td>possibleValueList
+<td>Possible Values
+<td><tt>&lt;List> of &lt;String> | &lt;None></tt>
+<td>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Disabled", "Read Only", and "Value" values will be <tt>&lt;None></tt> if the
+form control is not selected.
+<li>The "Possible Values" value will be a list of the other possible values that
+may be specified for this form control, or <tt>&lt;None></tt> if there are no
+other possible values that may be specified for this form control or if it's
+not applicable for this type of form control.
+</ol>
+</tr>
+</tfoot>
+</table>
+</ul>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get information about the form named "The Post Form" in session 3.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM NAME "The Post Form" SESSION 3</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+{
+  Index    : 2
+  Form ID  : POST_FORM
+  Form Name: The Post Form
+  Method   : Post
+  Action   : http://www.htmlcodetutorial.com/cgi-bin/mycgi.pl
+  Headers  : {}
+}
+</pre>
+<P>
+<li><b>Goal:</b>> Get information about the first form in session 2.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM SESSION 2</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+{
+  Index    : 1
+  Form ID  : GET_FORM
+  Form Name: The Get Form
+  Method   : Get
+  Action   : http://www.htmlcodetutorial.com/cgi-bin/mycgi.pl
+  Headers  : {
+    job    : test
+    user-id: Bob
+  }
+}
+</pre>
+<P>
+<li><b>Goal:</b> Get information about the second form in session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM INDEX 2 SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<P>
+<pre>
+{
+  Index    : 2
+  Form ID  : POST_FORM
+  Form Name: The Post Form
+  Method   : Post
+  Action   : http://www.htmlcodetutorial.com/cgi-bin/mycgi.pl
+  Headers  : {}
+}
+</pre>
+<li><b>Goal:</b> Get information about the form with id POST_FORM in session 3.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM ID POST_FORM SESSION 3</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+{
+  Index    : 2
+  Form ID  : POST_FORM
+  Form Name: The Post Form
+  Method   : Post
+  Action   : http://www.htmlcodetutorial.com/cgi-bin/mycgi.pl
+  Headers  : {}
+}
+</pre>
+<P>
+<li><b>Goal:</b> Get information about the form control named "animal", a radio
+input, for the third form in session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM INDEX 3 CONTROLNAME animal SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : input type=radio
+  Disabled       : No
+  Read Only      : No
+  Value          : dog
+  Possible Values: [
+    cat
+    bird
+  ]
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "myself", a textarea,
+for the first form in session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM CONTROLNAME myself SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : textarea
+  Disabled       : No
+  Read Only      : No
+  Value          : I was born in the house my father built.
+  Possible Values: &lt;None>
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "nosmoke=", a checkbox
+input, for the second form in session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM INDEX 2 CONTROLNAME nosmoke= SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : input type=checkbox
+  Disabled       : No
+  Read Only      : No
+  Value          : CHECKED
+  Possible Values: &lt;None>
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "realname", a text input,
+for the form named "The Post Form" in session 2.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM NAME "The Post Form" CONTROLNAME realname SESSION 2</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : input type=text
+  Disabled       : No
+  Read Only      : No
+  Value          : George the Wonder Boy
+  Possible Values: &lt;None>
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "submit", a submit group,
+for the form named "The Submit Form" in session 2.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM NAME "The Submit Form" CONTROLNAME submit SESSION 2</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : Submit group
+  Disabled       : No
+  Read Only      : No
+  Value          : GO=go
+  Possible Values: [
+    GO=go
+    Stay=stay
+    roll over=Roll Over
+    pic=,&lt;valueX>,&lt;valueY>
+  ]
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "who", of type select
+and currently not selected, for form ID "POST_FORM_2" in session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM ID POST_FORM_2 CONTROLNAME who SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : &lt;None>
+  Possible Values: [
+    foo
+    sam
+  ] 
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "who1", of type
+select multiple with two values, foo and sam, selected', for form ID "POST_FORM_2"
+in session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM NAME POST_FORM_2 CONTROLNAME who1 SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : select multiple
+  Disabled       : No
+  Read Only      : No
+  Value          : foo
+sam
+  Possible Values: [] 
+}
+</pre>
+<p>
+<li><b>Goal:</b> Get information about the form control named "null", of type null,
+for the form named "The Post Form" in session 2.</P>
+<p><b>Syntax:</b> <tt>QUERY FORM NAME "The Post Form" CONTROLNAME null SESSION 2</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the verbose format,
+could look like: 
+<pre>
+{
+  Type           : null type
+  Disabled       : null
+  Read Only      : null
+  Value          : &lt;None>
+  Possible Values: &lt;None>
+}
+</pre>
+</ul>
+
+<H2><A name=FORM_SET href="#ToC_FORM">SET FORM</A></H2>
+<P>
+This command provides access to the form control elements in the current
+page of the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+SET     FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;]
+        CONTROLNAME &lt;Name&gt; VALUE &lt;Value&gt; SESSION &lt;Session&gt;
+</PRE>
+<tt>FORM</tt> specifies to set a form control name.
+<P>
+<tt>NAME</tt> identifies the name attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>ID</tt> identifies the id attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>INDEX</tt> identifies the index of the form to be selected in the list of forms
+in the current page. This is a 1-based index.
+If no form is identified, the form at index 1 is selected.
+This option will resolve variables.</P>
+<P>
+<tt>CONTROLNAME</tt> specifies the form control to set. In most cases, this is the name attribute of
+the control element. The exception is input elements of type checkbox,
+submit, and image.  See <a href="#Form Controls">Appendix A: Form Control Guide</a>
+for more information.
+This option will resolve variables.</P>
+<P>
+<tt>VALUE</tt> specifies the new value for the form control.
+See <a href="#Form Controls">Appendix A: Form Control Guide</a> for
+more information.
+This option will resolve variables.  This option will handle private data.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session containing the form.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Set the input element named user to the value me for the form named
+Form_1 in session 3.
+<P><b>Syntax:</b>
+<tt>SET FORM NAME Form_1 SESSION 3 CONTROLNAME user VALUE me</tt>
+</ul>
+<p>For more examples of setting control values for forms, see 
+<a href="#Form Controls">Appendix A: Form Control Guide</a>.
+
+<H2><A name=FORM_SUBMIT href="#ToC_FORM">SUBMIT FORM</A></H2>
+
+<P>This command submits a form from the current page in the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+SUBMIT  FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] SESSION &lt;Session&gt;
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+</PRE>
+<tt>FORM</tt> specifies to submit form from the current page in the specifies session.
+<P>
+<tt>NAME</tt> identifies the name attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>ID</tt> identifies the id attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>INDEX</tt> identifies the index of the form to be selected in the list of forms in
+the current page. This is a 1-based index.
+If no form is identified, the form at index 1 is selected.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session containing the form.
+This option will resolve variables.</P>
+<P>
+<tt>FOLLOWREDIRECT</tt> specifies the session should attempt to follow any 3XX return codes it
+gets from attempting the request. This is a recursive process and will
+follow up to 100 redirects. This option will override the session setting.
+The contents of the result buffer will contain the result of the last redirect
+followed.</P>
+<P>
+<tt>DONOTFOLLOWREDIRECT</tt> specifies the session should not attempt to follow any 3XX return codes it gets from attempting the request. This option will override the session setting.</P>
+<P>
+<tt>FILE</tt> specifies the fully-qualified name of a file where the response should be stored.
+If the <tt>FILE</tt> option is not specified, the response will be returned
+in the STAF result buffer. If an error occurs writing to the file, an error
+will be generated and the response will be returned in the result buffer.
+An error will occur if the parent directory for the file does not exist.
+This option will resolve variables.</P>
+<P>
+<tt>TOMACHINE</tt> specifies the machine where the output file should be stored.
+The output file will be stored on the HTTP service machine if this option is not specified.
+This option will resolve variables.</P>
+<P>
+<tt>IGNOREERRORS</tt> specifies that HTTP client and server errors
+(HTTP status codes of 4XX and 5XX) should be ignored. The default is to
+return a non-zero STAF return code when an HTTP error is encountered. If
+this option is specified and an error occurs, the command will return a
+0 code. However, the status code will still be returned, unless disabled.
+See the <a href="#return codes">Return Codes</a> section
+of the <tt>REQUEST</tt> command for more information.</P>
+<P>
+<tt>NOSTATUS</tt> specifies that the HTTP response code and HTTP
+response message should not be returned in the result. The default is to include
+both of these values in the output.</P>
+<P>
+<tt>RETURNHEADERS</tt> specifies that all HTTP headers in the
+HTTP response should be returned with the result. The default is to not include
+headers in the output.</P>
+<P>
+<tt>RETURNNOCONTENT</tt> specifies that the HTTP response body should
+not be returned in the result. The default is to include it in the output.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+<p>
+Also, if option TOMACHINE is specified, the HTTP service machine requires
+trust level 4 on the target machine in order to copy the file from the
+HTTP service machine to the target machine.
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain the output of the HTTP response.
+The format of this output is described in
+the <a href="#REQUEST Results">Results</a> section for the REQUEST command.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Submit Form_1 in session 3 using the submit button with name Go and
+value GO.</P>
+<P><b>Syntax:</b> 
+<p>
+<tt>SET FORM SESSION 3 NAME Form_1 CONTROLNAME submit VALUE Go=GO</tt><BR>
+<tt>SUBMIT FORM SESSION 3 NAME Form_1 </tt></P>
+</ul>
+
+<H2><A name=FORM_RESET href="#ToC_FORM">RESET FORM</A></H2>
+<P>
+This command provides a way to reset the contents of a form in the current
+page of the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+RESET   FORM [NAME &lt;Form Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;] SESSION &lt;Session&gt;
+</PRE>
+<tt>FORM</tt> specifies to reset the contents of a form.
+<P>
+<tt>NAME</tt> identifies the name attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>ID</tt> identifies the id attribute to use to specify the form. If more than
+one form has the same name, the first form will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>INDEX</tt> identifies the index of the form to be selected in the list of forms
+in the current page. This is a 1-based index.
+If no form is identified, the form at index 1 is selected.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session containing the form.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will be empty.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Reset the control values for the form named Form_1 in session 3.
+<P><b>Syntax:</b>
+<tt>RESET FORM SESSION 3 NAME Form_1</tt>
+</ul>
+
+<HR>
+<H1><A name=LINK href="#ToC_LINK">Link Management</A></H1>
+
+<H2><A name=LINK_LIST href="#ToC_LINK">LIST LINKS</A></H2>
+<P>
+This command provides a list of the links elements in the current page
+of the specified session.</P>
+
+<H4>Syntax</H4>
+
+<PRE>
+LIST    LINKS SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>LINKS</tt> specifies to list the link elements on the current page of
+the specified session.
+<p>
+<tt>SESSION</tt> specifies the session id.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a marshalled
+<tt>&lt;List> of &lt;Map:STAF/Service/HTTP/ListLink></tt> representing a list
+of the links in the specified page of the specified session.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/ListLink</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents summary information for a link.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>linkIndex
+<td>Index
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>linkID
+<td>Link ID
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>linkName
+<td>Link Name
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Index" value is set to index of the link.
+<li>The "Link ID" value is set to the Id attribute for the link, or <tt>&lt;None></tt>
+if the link doesn't have one.
+<li>The "Link Name" value is set to the name attribute for the link, or <tt>&lt;None></tt>
+if the link doesn't have one.
+</ol>
+</tr>
+</tfoot>
+</table>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get a list of links in session 1
+<p><b>Syntax:</b> <tt>LIST LINKS SESSION 1</tt>
+<p><b>Results:</b>
+If the request is submitted from the command line, the result, in the table format,
+could look like: 
+<pre>
+Index Link ID Link Name
+----- ------- ---------
+1     &lt;None>  tamu
+2     CHI     chi
+3     &lt;None>  csdl
+</pre>
+</ul>
+
+<H2><A name=LINK_QUERY href="#ToC_LINK">QUERY LINK</A></H2>
+<P>
+This command provides information about the specified link in the current page
+of the specified session.</P>
+
+<H4>Syntax</H4>
+<PRE>
+QUERY   LINK &lt;NAME &lt;Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;&gt; SESSION &lt;Session&gt;
+</PRE>
+<P>
+<tt>LINK</tt> specifies to query information about a link.
+<P>
+<tt>NAME</tt> specifies the name attribute of the link to follow in the current page.
+If more than one link has the same name, the first name will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>ID</tt> specifies the id attribute of the link to follow in the current page.
+This option will resolve variables.</P>
+<P>
+<tt>INDEX</tt> specifies the index of the link to follow in the currenbt page.
+This is a 1-based index.
+This option will resolve variables.</P>
+<p>
+<tt>SESSION</tt> specifies the session id.
+This option will resolve variables.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 2 or higher.</P>
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain a
+marshalled <font face="Courier New,Courier"><font size=-1>
+&lt;Map:STAF/Service/HTTP/Link></font></font> representing the specified link
+in the session.
+The map is defined as follows:
+<p>
+<table border>
+<thead>
+<tr>
+<th COLSPAN="4">Definition of map class STAF/Service/HTTP/Link</th>
+</tr>
+<tr>
+<td colspan="4"><b>Description: </b>This map class represents a link.</td>
+</tr>
+<tr>
+<th width=20%>Key Name
+<th width=20%>Display Name
+<th width=30%>Type
+<th width=30%>Format / Value
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>linkIndex
+<td>Index
+<td><tt>&lt;String></tt>
+<td>
+<tr>
+<td>linkID
+<td>Link ID
+<td><tt>&lt;String> | &lt;None></tt>
+<td>
+<tr>
+<td>linkName
+<td>Link Name
+<td><tt>&lt;String> | &lt;None></tt>
+<tr>
+<td>href
+<td>Href
+<td><tt>&lt;String></tt>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<b>Notes:</b>
+<ol compact>
+<li>The "Index" value is set to index of the link.
+<li>The "Link ID" value is set to the Id attribute for the link, or <tt>&lt;None></tt>
+if the link doesn't have one.
+<li>The "Link Name" value is set to the name attribute for the link, or <tt>&lt;None></tt>
+if the link doesn't have one.
+<li>The "Href" value is set to the link target Url.
+</ol>
+</tr>
+</tfoot>
+</table>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Get information about the link with id Link_2 in the current
+page for session 2.</P>
+<p><b>Syntax:</b> <tt>QUERY LINK ID LINK_2 SESSION 2</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Index : 2
+Name  : test
+Id    : LINK_2
+Href  : http://www.htmlcodeturorial.com/
+</pre>
+<P>
+<li><b>Goal:</b> Get information about the first link in the current
+page for session 3.</P>
+<p><b>Syntax:</b> <tt>QUERY LINK INDEX 1 SESSION 3</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Index : 1
+Name  : My Link
+Id    : MYLINK
+Href  : http://www.mysite.com/
+</pre>
+<P>
+<li><b>Goal:</b> Get information about the link with name attribute "My Link" in the current
+page for session 1.</P>
+<p><b>Syntax:</b> <tt>QUERY LINK NAME "My Link" SESSION 1</tt>
+<p><b>Result:</b>
+If the request is submitted from the command line, the result, in the default format,
+could look like: 
+<pre>
+Index : 1
+Name  : My Link
+Id    : MYLINK
+Href  : http://www.mysite.com/
+</pre>
+</ul>
+
+<H2><A name=LINK_FOLLOW href="#ToC_LINK">FOLLOW LINK</A></H2>
+<P>
+This command changes the url of a session. It is equivalent to issuing
+a <tt>DOGET</tt> command with the <tt>URL</tt> value set to the href of the link.</P>
+<H4>Syntax</H4>
+
+<PRE>
+FOLLOW  LINK &lt;NAME &lt;Name&gt; | ID &lt;Id&gt; | INDEX &lt;Index&gt;&gt; SESSION &lt;Session&gt;
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT]
+        [FILE &lt;Filename&gt; [TOMACHINE &lt;Machine&gt;]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+</PRE>
+<P>
+<tt>LINK</tt> specifies to follow a link in the current page of the specified session.
+<p>
+<tt>NAME</tt> specifies the name attribute of the link to follow. If more than
+one link has the same name, the first name will be selected.
+This option will resolve variables.</P>
+<P>
+<tt>ID</tt> specifies the id attribute of the link to follow.
+This option will resolve variables.</P>
+<P>
+<tt>INDEX</tt> specifies the index of the link to follow.
+This is a 1-based index.
+This option will resolve variables.</P>
+<P>
+<tt>SESSION</tt> specifies the id of the session.
+This option will resolve variables.</P>
+<P>
+<tt>FOLLOWREDIRECT</tt> specifies the session should attempt to follow any 3XX return codes it
+gets from attempting the request. This is a recursive process and will
+follow up to 100 redirects. This option will override the session setting.
+The contents of the result buffer will contain the result of the last redirect
+followed.</P>
+<P>
+<tt>DONOTFOLLOWREDIRECT</tt> specifies the session should not attempt to follow
+any 3XX return codes it gets from attempting the request. This option will
+override the session setting.</P>
+<P>
+<tt>FILE</tt> specifies the fully-qualified name of a file where the response will be stored.
+If the <tt>FILE</tt> option is not specified, the response will be returned
+in the result buffer. If an error occurs writing to the file, an error
+will be generated and the response will be returned in the result buffer.
+An error will occur if the parent directory for the file does not exist.
+This option will resolve variables.</P>
+<P>
+<tt>TOMACHINE</tt> specifies the machine where the output file will be stored.
+The output file will be stored on the HTTP service machine if this option is not specified.
+This option will resolve variables.</P>
+<P>
+<tt>IGNOREERRORS</tt> specifies that HTTP client and server errors
+(HTTP status codes of 4XX and 5XX) should be ignored. The default is to
+return a non-zero STAF return code when an HTTP error is encountered. If
+this option is specified and an error occurs, the command will return a
+0 code. However, the status code will still be returned, unless disabled.
+See the <a href="#return codes">Return Codes</a> section
+of the <tt>REQUEST</tt> command for more information.</P>
+<P>
+<tt>NOSTATUS</tt> specifies that the HTTP response code and HTTP
+response message should not be returned in the result. The default is to include
+both of these values in the output.</P>
+<P>
+<tt>RETURNHEADERS</tt> specifies that all HTTP headers in the
+HTTP response should be returned with the result. The default is to not include
+headers in the output.</P>
+<P>
+<tt>RETURNNOCONTENT</tt> specifies that the HTTP response body should
+not be returned in the result. The default is to include it in the output.</P>
+
+<H4>Security</H4>
+<P>
+This command requires trust level 3 or higher for the session owner or
+requires trust level 4 for non-session owners.</P>
+<p>
+Also, if option TOMACHINE is specified, the HTTP service machine requires
+trust level 4 on the target machine in order to copy the file from the
+HTTP service machine to the target machine.
+
+<H4>Results</H4>
+<P>
+If successful, the result buffer will contain the output of the HTTP response.
+The format of this output is described in
+the <a href="#REQUEST Results">Results</a> section for the REQUEST command.</P>
+
+<H4>Examples</H4>
+<P>
+<ul>
+<li><b>Goal:</b> Follow the link with id Link_1 in session 3.
+<p><b>Syntax:</b> <tt>FOLLOW LINK SESSION 3 ID Link_1</tt>
+</ul>
+    
+<hr>
+<h1><a NAME="VERSION" href="#ToC_VERSION">VERSION</a></h1>
+
+VERSION displays the HTTP Service version.
+
+<h4>Syntax</h4>
+
+<tt>VERSION</tt>
+
+<h4>Security</h4>
+
+This request requires at least trust level 1.
+
+<h4>Results</h4>
+
+The result is the version number of the HTTP service.
+
+<h4>Examples</h4>
+
+<ul>
+<li><b>Goal:</b> Display the version of the HTTP service:
+<p><tt>VERSION</tt>
+<p><b>Output:</b>
+<pre>
+3.0.4
+</pre>
+</ul>
+
+<hr>
+<h1><a NAME="HELP" href="#ToC_HELP">HELP</a></h1>
+
+HELP displays the request options and how to use them.
+
+<h4>Syntax</h4>
+
+<tt>HELP</tt>
+
+<h4>Security</h4>
+
+This request requires at least trust level 1.
+
+<h4>Results</h4>
+
+The result buffer contains the Help text for the request options for
+the HTTP service.
+
+<h4>Examples</h4>
+
+<ul>
+<li><b>Goal:</b> Display the syntax for the HTTP service requests:
+<p><tt>HELP</tt>
+<p><b>Output:</b>
+<pre>
+*** HTTP Service Help ***
+
+OPEN    SESSION
+CLOSE   SESSION &lt;Session>
+LIST    SESSIONS
+LIST    &lt;FORMS | LINKS | COOKIES | DEFAULTHEADERS | AUTHENTICATIONHOSTS |
+        CONTROLNAMES FORM [NAME &lt;Form Name> | ID &lt;Id> | INDEX &lt;Index>]>
+        SESSION &lt;Session>
+QUERY   SESSION &lt;Session>
+GET     SESSION &lt;Session> CONTENT [FILE &lt;File Name> [TOMACHINE &lt;Machine>]]
+
+REQUEST METHOD &lt;Http Method> URL &lt;Target Url> [ENCODED] [CONTENT &lt;Content>]
+        [HEADER &lt;Key>=&lt;Value>]... [PARAMETER &lt;Key>=&lt;Value>]...
+        [CONTENTFILE &lt;Key>=&lt;File Name>]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session>]
+        [FILE &lt;Filename> [TOMACHINE &lt;Machine>]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+DOPOST  URL &lt;Target Url> [ENCODED] [CONTENT &lt;Content>]
+        [HEADER &lt;Key>=&lt;Value>]... [PARAMETER &lt;Key>=&lt;Value>]...
+        [CONTENTFILE &lt;Key>=&lt;File Name>]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session>]
+        [FILE &lt;Filename> [TOMACHINE &lt;Machine>]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+DOGET   URL &lt;Target Url> [ENCODED] [CONTENT &lt;Content>]
+        [HEADER &lt;Key>=&lt;Value>]... [PARAMETER &lt;Key>=&lt;Value>]...
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT] [SESSION &lt;Session>]
+        [FILE &lt;Filename> [TOMACHINE &lt;Machine>]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+
+SET     &lt;FOLLOWREDIRECT | DONOTFOLLOWREDIRECT> SESSION &lt;Session>
+SET     PARSECONTENT &lt;Enabled | Disabled | Autodetect> SESSION &lt;Session>
+SET     HTTPPROXYHOST &lt;Host> [HTTPPROXYPORT &lt;Port>] SESSION &lt;Session>
+
+QUERY   AUTHENTICATIONHOST &lt;Host> SESSION &lt;Session>
+SET     AUTHENTICATIONHOST &lt;Host> AUTHENTICATIONUSER &lt;User>
+        [AUTHENTICATIONPASSWORD &lt;Password>] [AUTHENTICATIONDOMAIN &lt;Domain>]
+        SESSION &lt;Session>
+DELETE  AUTHENTICATIONHOST &lt;Host> SESSION &lt;Session>
+
+QUERY   DEFAULTHEADER &lt;Key> SESSION &lt;Session>
+SET     DEFAULTHEADER &lt;Key> VALUE &lt;Value> SESSION &lt;Session>
+DELETE  DEFAULTHEADER &lt;Key> SESSION &lt;Session>
+
+QUERY   COOKIE NAME &lt;Name> SESSION &lt;Session>
+SET     COOKIE &lt;NAME &lt;Name> VALUE &lt;Value>> | &lt;POLICY &lt;policy>>
+        SESSION &lt;Session>
+DELETE  COOKIE NAME &lt;Name> SESSION &lt;Session>
+
+QUERY   FORM [NAME &lt;Form Name> | ID &lt;Id> | INDEX &lt;Index>] [CONTROLNAME &lt;Name>]
+        SESSION &lt;Session>
+SET     FORM [NAME &lt;Form Name> | ID &lt;Id> | INDEX &lt;Index>]
+        CONTROLNAME &lt;Name> VALUE &lt;Value> SESSION &lt;Session>
+SUBMIT  FORM [NAME &lt;Form Name> | ID &lt;Id> | INDEX &lt;Index>] SESSION &lt;Session>
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT]
+        [FILE &lt;Filename> [TOMACHINE &lt;Machine>]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+RESET   FORM [NAME &lt;Form Name> | ID &lt;Id> | INDEX &lt;Index>] SESSION &lt;Session>
+
+QUERY   LINK &lt;NAME &lt;Name> | ID &lt;Id> | INDEX &lt;Index>> SESSION &lt;Session>
+FOLLOW  LINK &lt;NAME &lt;Name> | ID &lt;Id> | INDEX &lt;Index>> SESSION &lt;Session>
+        [FOLLOWREDIRECT | DONOTFOLLOWREDIRECT]
+        [FILE &lt;Filename> [TOMACHINE &lt;Machine>]]
+        [IGNOREERRORS] [NOSTATUS] [RETURNHEADERS] [RETURNNOCONTENT]
+
+HELP
+
+VERSION
+</pre>
+</ul>
+
+<HR>
+<H1><A name="SessionExample" href="#ToC_SessionExample">Session Examples</A></H1>
+<P>
+This section provides several examples of how the session functionality
+of the HTTP service can be leveraged.
+<p>
+The examples provided are submitting requests to the HTTP
+service from the command line, but the requests can also be submitted via
+a program (e.g. a shell script, Java program, etc).</P>
+<P>
+<h2><a name="Example1" href="#ToC_Example1">Example 1: SSL Login Using Cookie Authentication and a Form</a></h2>
+<p>
+Demonstrates a SSL login using cookie authentication, and the use of
+a form to gather web based information.  This example logs into
+the SourceForge website, so to run this example, you need a
+SourceForge user id.</P>
+<p>
+<ol>
+<li>Open a new session:
+<pre>
+C:\><b>STAF local HTTP OPEN SESSION</b>
+Response
+--------
+1
+</pre>
+<p>
+<li>Enable automatic redirection:
+<pre>
+C:\><b>STAF local HTTP SET FOLLOWREDIRECT SESSION 1</b>
+Response
+--------
+
+</pre>
+<p>
+<li>Login to SourceForge (replace the value for the form_loginname parameter with your userid and
+replace the value for the form_pw parameter with your password, using privacy delimiters to
+protect your password):
+<p>
+<tt>
+C:\><b>STAF local HTTP DOPOST URL http://sourceforge.net/account/login.php PARAMETER form_loginname=user PARAMETER form_pw=!!@password@!! PARAMETER login=Login+With+SSL SESSION 1 RETURNNOCONTENT</b></tt>
+<pre>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<p>
+<li>Go to the STAF project webpage on SourceForge:
+<p>
+<tt>
+C:\><b>STAF local HTTP DOGET URL http://sourceforge.net/projects/staf SESSION 1 RETURNNOCONTENT</b></tt>
+<pre>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<p>
+<li>Get a list of pending bugs:
+<p>
+<tt>
+C:\><b>STAF local HTTP DOGET URL ../tracker/ PARAMETER group_id=33142 PARAMETER atid=407381 RETURNNOCONTENT SESSION 1</b></tt>
+<pre>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+<p>
+<b>Note:</b>  The group_id and atid parameters used in this request can be obtained by going
+to the bug tracker for the STAF project.  These parameters are used by SourceForge
+to index into the database and pull up the relevant entries to put in the
+displayed table.
+<p>
+<li>List the forms on this page and list the form controls for the form named "tracker_browse":
+<pre>
+C:\><b>STAF local HTTP LIST FORMS SESSION 1</b>
+Response
+--------
+Index Form ID Form Name
+----- ------- --------------
+1     &lt;None>  &lt;None>
+2     &lt;None>  &lt;None>
+3     &lt;None>  tracker_browse
+
+
+C:\><b>STAF local HTTP LIST FORM NAME tracker_browse CONTROLNAMES SESSION 1</b>
+Response
+--------
+submit
+group_id
+atid
+set
+_assigned_to
+_status
+_category
+_group
+by_submitter
+summary_keyword
+order
+sort
+</pre>
+<p>
+<li>Query the form controls named "_status", "sort", and "order" for the
+form named tracer_browse and look at their values.
+<pre>
+C:\><b>STAF local HTTP QUERY FORM NAME tracker_browse CONTROLNAME _status SESSION 1</b>
+Response
+--------
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : 1
+  Possible Values: [
+    100
+    2
+    3
+    4
+  ]
+}
+
+C:\><b>STAF local HTTP QUERY FORM NAME tracker_browse CONTROLNAME sort SESSION 1</b>
+Response
+--------
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : DESC
+  Possible Values: [
+    ASC
+  ]
+}
+
+C:\><b>STAF local HTTP QUERY FORM NAME tracker_browse CONTROLNAME order SESSION 1</b>
+Response
+--------
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : artifact_id
+  Possible Values: [
+    priority
+    summary
+    open_date
+    close_date
+    submitted_by
+    assigned_to
+  ]
+}
+</pre>
+<p>
+<li>De-select old values for the form controls named "_status", "sort", and "order":
+<p>
+<tt>
+C:\><b>STAF local HTTP SET FORM NAME tracker_browse CONTROLNAME _status VALUE 1 SESSION 1</b><br>
+Response<br>
+--------<br>
+<br>
+<br>
+C:\><b>STAF local HTTP SET FORM NAME tracker_browse CONTROLNAME sort VALUE DESC SESSION 1</b><br>
+Response<br>
+--------<br>
+<br>
+<br>
+C:\><b>STAF local HTTP SET FORM NAME tracker_browse CONTROLNAME order VALUE artifact_id SESSION 1</b><br>
+Response<br>
+--------<br>
+<br>
+<br>
+</tt>
+<p>
+<li>Select new values for the form controls named "_status", "sort", and "order":
+<p>
+<tt>
+C:\><b>STAF local HTTP SET FORM NAME tracker_browse CONTROLNAME _status VALUE 4 SESSION 1</b><br>
+Response<br>
+--------<br>
+<br>
+<br>
+C:\><b>STAF local HTTP SET FORM NAME tracker_browse CONTROLNAME sort VALUE ASC SESSION 1</b><br>
+Response<br>
+--------<br>
+<br>
+<br>
+C:\><b>STAF local HTTP SET FORM NAME tracker_browse CONTROLNAME order VALUE open_date SESSION 1</b><br>
+Response<br>
+--------<br>
+<br>
+<br>
+</tt>
+<p>
+<li>Verify the values for the form controls have been set:
+<pre>
+C:\><b>STAF local HTTP QUERY FORM NAME tracker_browse CONTROLNAME _status SESSION 1</b>
+Response
+--------
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : 4
+  Possible Values: [
+    100
+    1
+    2
+    3
+  ]
+}
+
+C:\><b>STAF local HTTP QUERY FORM NAME tracker_browse CONTROLNAME sort SESSION 1</b>
+Response
+--------
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : ASC
+  Possible Values: [
+    DESC
+  ]
+}
+
+C:\><b>STAF local HTTP QUERY FORM NAME tracker_browse CONTROLNAME order SESSION 1</b>
+Response
+--------
+{
+  Type           : select
+  Disabled       : No
+  Read Only      : No
+  Value          : open_date
+  Possible Values: [
+    artifact_id
+    priority
+    summary
+    close_date
+    submitted_by
+    assigned_to
+  ]
+}
+</pre>
+<p>
+<li>Submit the form and store the results in a file on the local HTTP service machine:
+<pre>
+C:\><b>STAF local HTTP SUBMIT FORM NAME tracker_browse SESSION 1 FILE C:\bugs.html</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+
+The C:\bugs.html file should be html file equivalent to acquiring the page in a browser.
+<p>
+<li>Close the session:
+<pre>
+C:\><b>STAF local HTTP CLOSE SESSION 1</b>
+Response
+--------
+
+</pre>
+</ol>
+
+<P>
+<h2><a name="Example2" href="#ToC_Example2">Example 2: Cookie Manipulation</a></h2>
+<p>
+This example demonstrates cookie manipulation.
+<P>
+<ol>
+<li>Open a new session:
+<pre>
+C:\><b>STAF local HTTP OPEN SESSION</b>
+Response
+--------
+1
+</pre>
+<p>
+<li>Use Amazon's website to show cookie behavior.
+Amazon's homepage is permanently redirected, and the cookies are set at
+two points along the redirect.
+<pre>
+C:\><b>STAF local HTTP SET FOLLOWREDIRECT SESSION 1</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP DOGET URL http://www.amazon.com RETURNNOCONTENT SESSION 1</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+
+C:\><b>STAF local HTTP LIST COOKIES SESSION 1</b>
+Response
+--------
+session-id-time
+session-id
+obidos_path_continue-shopping
+ubid-main
+
+C:\><b>STAF local HTTP QUERY COOKIE NAME session-id SESSION 1</b>
+Response
+--------
+Cookie Value   : 002-0415776-6781616
+Domain         : .amazon.com
+Path           : /
+Expiration Date: Sun Oct 31 02:00:00 CST 2004
+
+C:\><b>STAF local HTTP QUERY SESSION 1</b>
+Response
+--------
+{
+  Url              : http://www.amazon.com/exec/obidos/subst/home/home.html/002-0415776-6781616
+  Title            : 
+Amazon.com: Welcome
+
+  Status Code      : 200
+  Status Message   : OK
+  Cookie Policy    : rfc2109
+  Follows Redirects: Enabled
+  Parse Content    : AutoDetect
+  HTTP Proxy Host  : &lt;None>
+  HTTP Proxy Port  : &lt;None>
+  Owner            : {
+    Instance UUID: 1C0BF447A40D00000929359C75636173
+    Machine      : client1.austin.ibm.com
+    Handle Name  : STAF/Client
+    Handle       : 18
+  }
+}</pre>
+
+The end of the url should match the value of the session-id cookie.
+<p>
+<li>Open another session and use Amazon's website to show another example of cookie behavior:
+<pre>
+C:\><b>STAF local HTTP OPEN SESSION</b>
+Response
+--------
+2
+
+C:\><b>STAF local HTTP SET FOLLOWREDIRECT SESSION 2</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP SET COOKIE POLICY compatibility SESSION 2</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP DOGET URL http://www.amazon.com RETURNNOCONTENT SESSION 2</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+
+
+C:\><b>STAF local HTTP LIST COOKIES SESSION 2</b>
+Response
+--------
+obidos_path_continue-shopping
+session-id-time
+session-id
+
+</pre>
+Note the missing cookie in the list from session 2.
+<p>
+<li>Set a cookie value:
+<pre>
+C:\><b>STAF local HTTP SET COOKIE NAME session-id VALUE 000010001 SESSION 2</b>
+Response
+--------
+
+
+C:\>STAF local HTTP QUERY COOKIE NAME session-id SESSION 2
+Response
+--------
+Cookie Value   : 000010001
+Domain         : .amazon.com
+Path           : /
+Expiration Date: Sun Oct 31 02:00:00 CST 2004
+</pre>
+<p>
+<li>Add a cookie:
+<pre>
+C:\><b>STAF local HTTP SET COOKIE NAME new_cookie VALUE new SESSION 2</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP LIST COOKIES SESSION 2</b>
+Response
+--------
+obidos_path_continue-shopping
+session-id-time
+session-id
+new_cookie
+
+
+C:\><b>STAF local HTTP QUERY COOKIE NAME new_cookie SESSION 2</b>
+Response
+--------
+Cookie Value   : new
+Domain         : &lt;None>
+Path           : &lt;None>
+Expiration Date: &lt;None>
+</pre>
+<p>
+<li>Close the sessions:
+<pre>
+C:\><b>STAF local HTTP CLOSE SESSION 1</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP CLOSE SESSION 2</b>
+Response
+--------
+
+</pre>
+</ol>
+<p>
+<h2><a name="Example3" href="#ToC_Example3">Example 3: Using Default Headers</a></h2>
+<P>
+This example demonstrates the use of default headers.</P>
+<ol>
+<li>Open a session:
+<pre>
+C:\><b>STAF local HTTP OPEN SESSION</b>
+Response
+--------
+1
+</pre>
+<p>
+<li>Set a pair of headers to be sent with each request:
+<pre>
+C:\><b>STAF local HTTP SET DEFAULTHEADER myName VALUE Bob SESSION 1</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP SET DEFAULTHEADER age VALUE 23 SESSION 1</b>
+Response
+--------
+
+</pre>
+<p>
+<li>Verify that the STAF SourceForge web site supports TRACE:
+<pre>
+C:\><b>STAF local HTTP REQUEST METHOD options URL http://staf.sourceforge.net RETURNHEADERS</b>
+Response
+--------
+{
+  Status Code   : 200
+  Status Message: OK
+  Headers       : {
+    Allow         : GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, PATCH, PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK, TRACE
+    Connection    : close
+    Content-Length: 0
+    Date          : Thu, 03 Apr 2008 19:13:16 GMT
+    Server        : Apache/1.3.33 (Unix) PHP/4.3.10
+    X-Pad         : avoid browser bug
+  }
+  Content       :
+}</pre>
+<p>
+<li>Check what headers are received when requests are made:
+<pre>
+C:\><b>STAF local HTTP REQUEST METHOD trace URL http://staf.sourceforge.net SESSION 1</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+age: 23
+Host: staf.sourceforge.net
+myName: Bob
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+This should show that you sent a header myName: Bob and a header age: 23.
+<p>
+<li>Override the default headers on a request:
+<pre>
+C:\><b>STAF local HTTP REQUEST METHOD trace URL http://staf.sourceforge.net SESSION 1 HEADER age=21</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+age: 21
+Host: staf.sourceforge.net
+myName: Bob
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+This should show that you set a header myName: Bob and a header age: 21.
+<p>
+<li>Send an additional header with your request:
+<pre>
+C:\><b>STAF local HTTP REQUEST METHOD trace URL http://staf.sourceforge.net SESSION 1 HEADER job=admin</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+age: 23
+Host: staf.sourceforge.net
+job: admin
+myName: Bob
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+This should show that you sent headers myName: Bob, age: 23, and job: admin.
+The default header values are unaffected by the previous request.
+<p>
+<li>Change the header age:
+<pre>
+C:\><b>STAF local HTTP SET DEFAULTHEADER age VALUE 25 SESSION 1</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP REQUEST METHOD trace URL http://staf.sourceforge.net SESSION 1</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+age: 25
+Host: staf.sourceforge.net
+myName: Bob
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+This should show that you sent headers myName: Bob, and age: 25.
+<p>
+<li>Stop sending the age header:
+<pre>
+C:\><b>STAF local HTTP DELETE DEFAULTHEADER age SESSION 1</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP REQUEST METHOD trace URL http://staf.sourceforge.net SESSION 1</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+Host: staf.sourceforge.net
+myName: Bob
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+This should show that you sent one header myName: Bob.
+<p>
+<li>Set myNames to be a multi-value header:
+<pre>
+C:\><b>STAF local HTTP SET DEFAULTHEADER myNames VALUE "Bob, Sam, George" SESSION 1</b>
+Response
+--------
+
+
+C:\><b>STAF local HTTP REQUEST METHOD trace URL http://staf.sourceforge.net SESSION 1</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : TRACE / HTTP/1.1
+Host: staf.sourceforge.net
+myName: Bob
+myNames: Bob, Sam, George
+User-Agent: Jakarta Commons-HttpClient/3.1
+</pre>
+This should show that you sent one header myNames: Bob, Sam, George.
+<p>
+<li>Close the session:
+<pre>
+C:\><b>STAF local HTTP CLOSE SESSION 1</b>
+Response
+--------
+
+</pre>
+</ol>
+<P>
+<h2><a name="Example4" href="#ToC_Example4">Example 4: Using Links</a></h2>
+<p>
+This example demonstrates the use of links.</p>
+<p>
+<ol>
+<li>Open a session:
+<pre>
+C:\><b>STAF local HTTP OPEN SESSION</b>
+Response
+--------
+1
+</pre>
+<p>
+<li>Go to your test site:
+<p>
+<tt>C:\><b>STAF local HTTP DOGET URL ais.austin.ibm.com/content/Other/test/testHTTP.html RETURNNOCONTENT SESSION 1</b></tt>
+<pre>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+
+<li>Get a list of links on the page:
+<pre>
+C:\><b>STAF local HTTP LIST LINKS SESSION 1</b>
+Response
+--------
+Index Link ID Link Name
+----- ------- ---------
+1     tamu    &lt;None>
+2     chi     &lt;None>
+3     csdl    &lt;None>
+</pre>
+<p>
+<li>Check the url of one with id tamu:
+<pre>
+C:\><b>STAF local HTTP QUERY LINK ID tamu SESSION 1</b>
+Response
+--------
+Index    : 1
+Link ID  : tamu
+Link Name: &lt;None>
+Href     : http://www.tamu.edu/
+</pre>
+<p>
+<li>Follow the link:
+<pre>
+C:\><b>STAF local HTTP FOLLOW LINK ID tamu SESSION 1 RETURNNOCONTENT</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+Verify the link went where it was supposed to go:
+<pre>
+C:\><b>STAF local HTTP QUERY SESSION 1</b>
+Response
+--------
+{
+  Url              : http://www.tamu.edu/
+  Title            : Texas A&M University - College Station
+  Status Code      : 200
+  Status Message   : OK
+  Cookie Policy    : rfc2109
+  Follows Redirects: Disabled
+  Parse Content    : AutoDetect
+  HTTP Proxy Host  : &lt;None>
+  HTTP Proxy Port  : &lt;None>
+  Owner            : {
+    Instance UUID: 1C0BF447A40D00000929359C75636173
+    Machine      : client1.austin.ibm.com
+    Handle Name  : STAF/Client
+    Handle       : 18
+  }
+}
+</pre>
+
+This has the same effect as a doget to the href of the link:
+<pre>
+C:\><b>STAF local HTTP DOGET URL http://www.tamu.edu SESSION 1 RETURNNOCONTENT</b>
+Response
+--------
+Status Code   : 200
+Status Message: OK
+Headers       : &lt;None>
+Content       : &lt;None>
+</pre>
+
+Verify the link went to the same place as the FOLLOW LINK command:
+<pre>
+C:\><b>STAF local HTTP QUERY SESSION 1</b>
+Response
+--------
+{
+  Url              : http://www.tamu.edu/
+  Title            : Texas A&M University - College Station
+  Status Code      : 200
+  Status Message   : OK
+  Cookie Policy    : rfc2109
+  Follows Redirects: Disabled
+  Parse Content    : AutoDetect
+  HTTP Proxy Host  : &lt;None>
+  HTTP Proxy Port  : &lt;None>
+  Owner            : {
+    Instance UUID: 1C0BF447A40D00000929359C75636173
+    Machine      : client1.austin.ibm.com
+    Handle Name  : STAF/Client
+    Handle       : 18
+  }
+}</pre>
+<p>
+<li>Close the session:
+<pre>
+C:\><b>STAF local HTTP CLOSE SESSION 1</b>
+Response
+--------
+
+</pre>
+</ol>
+
+<HR>
+<H1><A name="Errors" href="#ToC_8">HTTP Error Code Reference</A></H1>
+
+<P>In addition to the common STAF return codes, the following HTTP
+return codes are defined:
+<BR>
+</P>
+<P><B>Table 1. HTTP Service Return Codes</B><BR>
+</P>
+<TABLE border="1" height="200">
+  
+    <TR>
+      <TH ALIGN=middle VALIGN=top WIDTH="14%" height="19">Error Code</TH>
+      <TH ALIGN=left VALIGN=top WIDTH="29%" height="19">Meaning</TH>
+      <TH ALIGN=left VALIGN=top WIDTH="57%" height="19">Comment</TH>
+    </TR>
+    <tr>
+      <TD ALIGN=middle VALIGN=top WIDTH="14%" height="19"><B>4001</B></TD>
+      <TD ALIGN=left VALIGN=top WIDTH="29%" height="19">Unknown Host Error</TD>
+      <TD ALIGN=left VALIGN=top WIDTH="57%" height="19">The specified host could not be 
+          found in the naming service.</TD>
+    </TR>
+    <tr>
+      <TD ALIGN=middle VALIGN=top WIDTH="14%" height="19"><B>4002</B></TD>
+      <TD ALIGN=left VALIGN=top WIDTH="29%" height="19">Connect Error</TD>
+      <TD ALIGN=left VALIGN=top WIDTH="57%" height="19">The host was located, 
+           but a connection could not be made to the specified port.</TD>
+    </TR>
+    <tr>
+      <TD ALIGN=middle VALIGN=top WIDTH="14%" height="19"><B>4003</B></TD>
+      <TD ALIGN=left VALIGN=top WIDTH="29%" height="19">Invalid Method</TD>
+      <TD ALIGN=left VALIGN=top WIDTH="57%" height="19">The specified method is not allowed. 
+          Allowed methods: POST, PUT, GET, HEAD, OPTIONS, DELETE, and TRACE.</TD>
+    </tr>
+    <tr>
+      <TD ALIGN=middle VALIGN=top WIDTH="14%" height="19"><B>4004</B></TD>
+      <TD ALIGN=left VALIGN=top WIDTH="29%" height="19">IO Exception</TD>
+      <TD ALIGN=left VALIGN=top WIDTH="57%" height="19">The host was located, but an 
+                               IO exception occurred opening a connection to the URL.</TD>
+    </TR>
+    <tr>
+      <TD ALIGN=middle VALIGN=top WIDTH="14%" height="19"><B>4005</B></TD>
+      <TD ALIGN=left VALIGN=top WIDTH="29%" height="19">Out of Memory Error</TD>
+      <TD ALIGN=left VALIGN=top WIDTH="57%" height="19">Trying to get content
+       that is too large. Recommend redirecting the content to a file using the
+       FILE option or, if the content is not needed, you may be able to specify
+       the RETURNNOCONTENT option depending on the request.</TD>
+    </tr>
+    <tr>
+      <TD ALIGN=middle VALIGN=top WIDTH="14%" height="19"><B>44XX<br>45XX</B></TD>
+      <TD ALIGN=left VALIGN=top WIDTH="29%" height="19">HTTP Errors</TD>
+      <TD ALIGN=left VALIGN=top WIDTH="57%" height="19">The Http request generated an HTTP error.
+         The HTTP error code is the last 3 digits of the error code.
+         See section 10 in <A href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</A> for
+         an explanation of HTTP return codes (e.g. 404, 501, etc).</TD>
+    </TR>
+  
+</TABLE>
+<p>
+
+<HR>
+<H1><A name="Form Controls" href="#ToC_AppFC">Appendix A: Form Control Guide</A></H1>
+
+<P>This section is intended to provide detailed information about interacting
+with the specific form control types.
+<p>
+For more information on HTML form controls, see the
+<A href="http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.13.4.2">
+World Wide Web Consortium (W3C)</A> website.
+</p>
+
+<H4>Getting Control Identifiers</H4>
+<P>
+Getting a list of control identifiers for a form is done with the 
+<tt>LIST FORM CONTROLNAMES</tt> command.
+See section <a href="#FORM_CONTROLS_LIST">LIST FORM CONTROLNAMES</a> for more information.
+
+<H4>Getting Control Values</H4>
+<p>
+Getting the current value of a form control is done with the
+<tt>QUERY FORM CONTROLNAME</tt> command.
+See section <a href="#FORM_QUERY">QUERY FORM</a> for more information.
+<p>
+
+<H4>Setting Control Values</h4>
+<p>
+Setting the value of an existing control is done using the
+<tt>SET FORM CONTROLNAME</tt> command.
+See section <a href="#FORM_SET">SET FORM</a> for more information.
+<p>
+<b>Notes:</b>
+<p>
+<ol>
+<li>Control identifiers and values are case sensitive.
+<p>
+<li>Disabled controls cannot be accessed. The values of read-only controls
+cannot be set, but they will be sent with the submission of the form.
+<p>
+<li>HTTP service form controls recognize the following attributes:
+ <ul>
+ <li>name
+ <li>value
+ <li>read-only
+ <li>disabled
+ <li>checked
+ <li>selected
+ </ul>
+</ol>
+<p>
+
+<h2>Control Types</h2>
+<p>
+Here are some of the control types:
+<p>
+<h3>TEXTAREA</h3>
+<blockquote>
+<p>This control type corresponds to HTTP elements identified by &lt;textarea&gt; tags.
+  <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - This option corresponds to the name attribute used to identify the control.
+    <li><b>VALUE</b> - The value of a text area is the text contained between the open
+    and close tags.
+  </ul>
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;textarea name=textarea_1&gt;Mary had a little lamb&lt;/textarea&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME textarea_1 VALUE &quot;Mary had a little lamb.&quot;
+    HTTP :
+    &nbsp;&nbsp;textarea_1=Mary+had+a+little+lamb</pre>
+  </UL>
+</blockquote>
+<p>
+<h3>INPUT type CHECKBOX</h3>
+<blockquote>
+<p>This control type corresponds to HTTP elements identified by &lt;input type=checkbox&gt; tags.
+  <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - The identifier of a checkbox is name=value, where name is the name attribute
+        of the control element and value is the value attribute of the control
+    <li><b>VALUE</b> - The value of a checkbox is either CHECKED or UNCHECKED, other values
+        are ignored.  Checked and unchecked are not case sensitive.
+  </ul>
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;input type=checkbox name=checkbox_1 value=check_1 checked/&gt;
+    &nbsp;&nbsp;&lt;input type=checkbox name=checkbox_1 value=check_2 /&gt;
+    &nbsp;&nbsp;&lt;input type=checkbox name=checkbox_2 checked /&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME checkbox_1=check_1 VALUE checked
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME checkbox_1=check_2 VALUE unchecked
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME checkbox_2= VALUE checked
+    HTTP : 
+    &nbsp;&nbsp;checkbox_1=check_1&amp;checkbox_2=</pre>
+ </blockquote>
+ <h3>INPUT type RADIO</h3>
+ <blockquote>
+ <p>This control type corresponds to HTTP elements identified by &lt;input type=radio&gt; tags.
+  <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - This option corresponds to the name attribute used to identify the control.
+    <li><b>VALUE</b> - This option corresponds to the value attribute of the radio control to select.
+  </ul>
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;input type=radio name=radio_1 value=option_1 checked/&gt;
+    &nbsp;&nbsp;&lt;input type=radio name=radio_1 value=option_2 /&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME radio_1 VALUE option_1
+    HTTP : 
+    &nbsp;&nbsp;radio_1=option_1</pre>
+  </UL>
+  <b>Note:</b> Only one radio control with a given name can be selected at a time.
+ </blockquote>
+ <p>
+ <h3>INPUT type SUBMIT</h3>
+ <blockquote>
+ <p>This control type corresponds to HTTP elements identified by &lt;input type=submit&gt; tags.
+
+ <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - The value 'submit' is used to identify the access to a SUBMIT control
+    <li><b>VALUE</b> - The SUBMIT control to select is identified by a value of name=value
+      <ul>
+      <li><b>name</b> - Name is the name attribute of the select button element.<br>
+      <li><b>value</b> - Value is the value attribute of the select button element
+      </ul>
+  </ul>
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;input type=submit name=button_1 value=do_1/&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME submit VALUE button_1=do_1
+    HTTP : 
+    &nbsp;&nbsp;button_1=do</pre>
+  <p>
+  <b>Notes:</b>
+  <ol>
+  <li>Only one SUBMIT or IMAGE control element may be selected at a time.
+  <li>The value name is restricted to controls which exist in the form when it is acquired.
+  </ol>
+</blockquote>
+ <p>
+ <h3>INPUT type IMAGE</h3>
+ <blockquote>
+ <p>This control type corresponds to HTTP elements identified by &lt;input type=img&gt; tags.
+
+ <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - The value 'submit' is used to identify the access to an IMAGE control
+    <li><b>VALUE</b> - The SUBMIT control to select is identified by a value of name=value
+      <ul>
+      <li><b>name</b> - Name is the name attribute of the select button element.<br>
+      <li><b>value</b> - Value is the coordinates that will be assigned to the button. The
+      format is value: ,valueX,valueY.  If there are no valueX/valueY attributes, their
+      values may be omitted.
+      </ul>
+  </ul>
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;input type=img name=picture_1 src=&quot;./images/pic.jpg&quot; valueX=123 valueY=80/&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME submit VALUE picture_1=,123,80
+    HTTP : 
+    &nbsp;&nbsp;picture_1.x=123&amp;picture_1.y=80</pre>
+  <p>
+  <b>Notes:</b>
+  <ol>
+  <li>The value name is restricted to controls which exist in the form when it is acquired.
+  <li>Only one SUBMIT or IMAGE control element may be selected at a time.
+  <li>If the initial selection of the form submission control is of type
+  IMAGE, the coordinates are set to &lt;valueX>,&lt;valueY> by default.
+  <li>The HTTP service does not check if the input coordinates are valid.
+  </ol>
+  </blockquote>
+  <p>
+  <h3>INPUT other types</h3>
+  <blockquote>
+  <p>This control type corresponds to HTTP elements identified by &lt;input&gt; tags with
+     other type attributes (e.g. text, file, hidden, password)
+
+  <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - This option corresponds to the name attribute used to identify the control.
+    <li><b>VALUE</b> - This option corresponds to the value attribute.
+  </ul>
+
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;input type=text name=text_1 value=&quot;some text&quot; /&gt;
+    &nbsp;&nbsp;&lt;input type=file name=file_1 value=&quot;c:\temp.gif&quot; /&gt;
+    &nbsp;&nbsp;&lt;input type=hidden name=hidden_1 value=secret /&gt;
+    &nbsp;&nbsp;&lt;input type=password name=pwd_1 value=pwd /&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME text_1 VALUE &quot;some text&quot;
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME file_1 VALUE &quot;c:\temp.gif&quot;
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME hidden_1 VALUE secret
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME pwd_1 VALUE !!@pwd@!!
+    HTTP : 
+    &nbsp;&nbsp;text_1=some+text&amp;hidden_1=secret&amp;pwd_1=pwd</pre>
+    This ignores the file since that causes a multipart post which has a different
+    format.
+  <p>
+  <b>Notes:</b>
+  <ol>
+  <li>A bad value for an INPUT of type FILE will cause form submission to fail.
+  <li>The presence of an INPUT of type FILE will cause a multipart post
+  which has a different HTTP format than the example.
+  </ol>
+  <p>
+  An explanation of multipart/form-data can be found in the 
+  <A href="http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.13.4.2">
+  Processing form data</A> section in hte W3C HTML Specification.
+  </blockquote>
+  <p>
+  <h3>SELECT</h3>
+  <blockquote>
+  <p>This control type corresponds to HTTP elements identified by &lt;select&gt; tags.
+
+  <h4>Service Request Options:</h4>
+  <ul>
+    <li><b>CONTROLNAME</b> - This option corresponds to the name attribute used to identify the control.
+    <li><b>VALUE</b> - This option corresponds to the value of an option to select or de-select.
+  </ul>
+
+  <h4>Example:</h4>
+    <pre>
+    HTML : 
+    &nbsp;&nbsp;&lt;select name=select_1 multiple/&gt;
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value=o_1&gt;1&lt;/option&gt;
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value=o_2 selected&gt;2&lt;/option&gt;
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value=o_3 selected&gt;3&lt;/option&gt;
+    &nbsp;&nbsp;&lt;select/&gt;
+    Service : 
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME select_1 VALUE o_2
+    &nbsp;&nbsp;SET FORM form_1 CONTROLNAME select_1 VALUE o_3
+    HTTP : 
+    &nbsp;&nbsp;select_1=o_2&amp;select_1=o_3</pre>
+  <p>
+  <b>Note:</b> It is necessary to explicitly de-select elements. This is true with
+  and without the <b>multiple</b> option in the html &lt;select> tag. If the element is a single
+  select, attempting to select a new option before de-selecting the current
+  option will result in an Invalid Value Error.
+  </blockquote>
+<p>
+
+<HR>
+<H1><A name="SSL" href="#ToC_AppSSL">Appendix B: SSL </a></H1>
+
+<P>The HTTP service uses HttpClient allows for navigation of ssl sites through
+the use of JSSE which is bundled with J2SE 1.4 and later.
+<p>
+Https is the protocol recognized by HttpClient for SSL.  See the 
+<A href="http://jakarta.apache.org/commons/httpclient/sslguide.html">HttpClient SSL guide</A>
+for more information.
+<p>
+Invalid JSSE configuration can be recognized by an RC 4000 when accessing
+a secure site with a java.lang.NoClassDefFoundError: javax/net/ssl/SSLSocketFactory
+message.
+<p>
+<b>Notes:</b>
+<ol>
+<li>When authenticating with cookies, if you are having trouble logging
+into a secure site and are not getting error messages on the post, try setting
+your cookie policy to COMPATIBILITY. It may be that the site you are attempting
+to log into does not use rc2109 compliant cookies, and you are not setting
+a needed cookie.
+<p>
+<li>When authenticating with cookies, if you are having trouble logging
+into a secure site and are receiving a http status code of 3XX on the post,
+it may be that additional cookies are being set by the page you are being
+redirected through. Try using the FOLLOWREDIRECT option with the post request.
+<p>
+<li>When submitting a preemptive authentication management request (e.g.
+specifying a request using the <tt>AUTHENTICATIONHOST</tt> option), if you
+are having trouble with authentication denied (401), check the JVMLog to
+get more detailed realm and host error information.
+</ol>
+<p>
+<h3>Examples</h3>
+<p>
+<b>Goal:</b> Login to the SourceForge website and go to the user's homepage. This is an example
+that uses cookies to authenticate.
+Use privacy delimiters to protect the password.
+<p>
+<tt>
+DOPOST URL http://sourceforge.net/account/login.php PARAMETER form_loginname=user
+PARAMETER form_pw=!!@password@!! PARAMETER login=Login+With+SSL SESSION 1 RETURNNOCONTENT RETURNHEADERS
+</tt>
+<p>
+<tt>DOGET URL https://sourceforge.net/my SESSION 1</tt>
+<p>
+<b>Goal:</b> Login to a private site that issues an authentication challenge that
+must be answered though user/password pop-up prompt. This is an example
+that uses preemptive authentication.
+Use privacy delimiters to protect the password.
+<p>
+<tt>SET AUTHENTICATIONHOST www.theSite.com AUTHENTICATIONUSER user AUTHENTICATIONPASSWORD !!@pwd@!!</tt>
+<p>
+<tt>DOGET URL www.theSite.com/myPersonalSection/index.html</tt>
+<p>
+
+<HR>
+<H1><A  name="AppendixAck" href="#ToC_AppAck">Appendix C: Licenses and Acknowledgements</A></H1>
+
+<h2>Apache Code Notices and Information</h2>
+<p>
+STAF's HTTP Service includes all or portions of the following software
+which IBM obtained under the terms and conditions of the Apache License
+Version 2.0, January 2004.  This software may also consist of voluntary
+contributions made by many individuals to the Apache Software Foundation.
+For more information on the Apache Software Foundation, please see
+<a href="http://www.apache.org">http://www.apache.org</a>. 
+</p>
+<p>
+<ul>
+<li>Apache Jakarta Commons HttpClient v3.1
+<p>HttpClient is designed to provide robust support for the base HTTP protocol
+and be easily extended.</p>
+<p>
+<li>Apache Jakarta Commons Codec v1.3
+<p>Commons Codec provides implementations of common encoders and decoders such as 
+Base64, Hex, various phonetic encodings, and URLs.</p>
+<p>
+<li>Apache Jakarta Commons Logging v1.1
+<p>The Commons Logging package is an ultra-thin bridge between different logging
+libraries. Commons components may use the Logging API to remove compile-time
+and run-time dependencies on any particular logging package, and contributors
+may write Log implementations for the library of their choice.</p>
+</ul>
+
+<h3>Acknowledgement</h3>
+
+<p>This product includes software developed by the Apache Software Foundation
+(<a href="http://www.apache.org/">http://www.apache.org/"</a>).</p>
+
+<h3>Apache License</h3>
+<!-- Saved from url: http://www.apache.org/licenses/ -->
+
+<p>IBM is required to provide you, as the recipient of such software, 
+with a copy of the following license notice from the Apache Software 
+Foundation:</p>
+
+<PRE>                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+</PRE>
+
+<h2>NekoHTML Notices and Information</h2>
+
+<p>
+STAF's HTTP Service includes all or portions of CyberNeko HTML Parser 0.9.5
+(NekoHTML) which IBM obtained under the terms and conditions of the CyberNeko
+Software License Version 1.0 (BSD Style), Apache License Version 1.1, Apache
+License 2.0 (shown above), and W3C Document Notice and License.  For more
+information on NekoHtml, please see <a href="http://sourceforge.net/projects/nekohtml/">
+http://sourceforge.net/projects/nekohtml</a>.
+</p>
+<p>
+NekoHTML is a simple <A href="http://www.w3.org/TR/html4/">HTML</A> scanner and 
+tag balancer that enables application programmers to parse HTML documents and 
+access the information using standard XML interfaces.
+</p>
+
+<h3>Acknowledgement</h3>
+
+<p>This product includes software developed by Andy Clark.</p>
+
+<h3>NekoHTML Licenses</h3>
+        
+<pre>
+The CyberNeko Software License. Version 1.0  (BSD Style)
+--------------------------------------------------------
+
+(C) Copyright 2002-2005, Andy Clark.  All rights reserved.
+ 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer. 
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in
+   the documentation and/or other materials provided with the
+   distribution.
+
+3. The end-user documentation included with the redistribution,
+   if any, must include the following acknowledgment:  
+     "This product includes software developed by Andy Clark."
+   Alternately, this acknowledgment may appear in the software itself,
+   if and wherever such third-party acknowledgments normally appear.
+
+4. The names "CyberNeko" and "NekoHTML" must not be used to endorse
+   or promote products derived from this software without prior 
+   written permission. For written permission, please contact 
+   andyc@cyberneko.net.
+
+5. Products derived from this software may not be called "CyberNeko",
+   nor may "CyberNeko" appear in their name, without prior written
+   permission of the author.
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR OTHER CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR 
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+====================================================================
+
+This license is based on the Apache Software License, version 1.1.
+
+
+W3C DOCUMENT NOTICE AND LICENSE
+--------------------------------
+http://www.w3.org/Consortium/Legal/2002/copyright-documents-20021231:
+
+Copyright © 1994-2002 World Wide Web Consortium, (Massachusetts Institute
+of Technology, Institut National de Recherche en Informatique et en
+Automatique, Keio University). All Rights Reserved.
+http://www.w3.org/Consortium/Legal/
+
+Public documents on the W3C site are provided by the copyright holders
+under the following license. The software or Document Type Definitions
+(DTDs) associated with W3C specifications are governed by the Software
+Notice. By using and/or copying this document, or the W3C document from
+which this statement is linked, you (the licensee) agree that you have
+read, understood, and will comply with the following terms and conditions:
+
+Permission to use, copy, and distribute the contents of this document, or
+the W3C document from which this statement is linked, in any medium for
+any purpose and without fee or royalty is hereby granted, provided that
+you include the following on ALL copies of the document, or portions
+thereof, that you use:
+
+   1. A link or URL to the original W3C document.
+   2. The pre-existing copyright notice of the original author, or if it
+      doesn't exist, a notice of the form: "Copyright © [$date-of-document]
+      World Wide Web Consortium, (Massachusetts Institute of Technology,
+      Institut National de Recherche en Informatique et en Automatique,
+      Keio University). All Rights Reserved. http://www.w3.org/Consortium/Legal/"
+      (Hypertext is preferred, but a textual representation is permitted.)
+   3. If it exists, the STATUS of the W3C document.
+
+When space permits, inclusion of the full text of this NOTICE should be
+provided. We request that authorship attribution be provided in any software,
+documents, or other items or products that you create pursuant to the
+implementation of the contents of this document, or any portion thereof.
+
+No right to create modifications or derivatives of W3C documents is granted
+pursuant to this license. However, if additional requirements (documented in
+the Copyright FAQ) are satisfied, the right to create modifications or
+derivatives is sometimes granted by the W3C to individuals complying with
+those requirements.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO
+REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT
+LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE
+FOR ANY PURPOSE; NOR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT
+INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE DOCUMENT OR THE
+PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+
+The name and trademarks of copyright holders may NOT be used in advertising
+or publicity pertaining to this document or its contents without specific,
+written prior permission. Title to copyright in this document will at all
+times remain with copyright holders.
+
+----------------------------------------------------------------------------
+
+This formulation of W3C's notice and license became active on April 05 1999
+so as to account for the treatment of DTDs, schema's and bindings. See the
+older formulation for the policy prior to this date. Please see our Copyright
+FAQ for common questions about using materials from our site, including
+specific terms and conditions for packages like libwww, Amaya, and Jigsaw.
+Other questions about this notice can be directed to site-policy@w3.org.
+webmaster
+(last updated by reagle on 1999/04/99.)
+</pre>
+
+<h2>Xerces2-J Notices and Information</h2>
+
+<p>STAF's HTTP Service includes all or portions of Xerces2-J 2.6.2 which IBM
+obtained under the terms and conditions of the Apache License Version 1.1.
+This software may also consist of voluntary contributions made by many
+individuals to the Apache Software Foundation.  For more information on the
+Apache Software Foundation, please see <a href="http://www.apache.org">
+http://www.apache.org</a>.</p>
+
+<p>XML Parser for Java (Xerces2-J) is a validating XML parser and processor written
+in 100% pure Java; it is a library for parsing and generating XML documents.
+This parser easily enables an application to read and write XML data.</p>
+
+<h3>Acknowledgement</h3>
+
+<p>This product includes software developed by the Apache Software Foundation
+(<a href="http://www.apache.org/">http://www.apache.org/</a>).</p>
+
+<h3>Apache License Version 1.1</h3>
+
+<PRE>
+/*
+ * The Apache Software License, Version 1.1
+ *
+ *
+ * Copyright (c) 1999-2004 The Apache Software Foundation.  All rights 
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer. 
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The end-user documentation included with the redistribution,
+ *    if any, must include the following acknowledgment:  
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowledgment may appear in the software itself,
+ *    if and wherever such third-party acknowledgments normally appear.
+ *
+ * 4. The names "Xerces" and "Apache Software Foundation" must
+ *    not be used to endorse or promote products derived from this
+ *    software without prior written permission. For written 
+ *    permission, please contact apache@apache.org.
+ *
+ * 5. Products derived from this software may not be called "Apache",
+ *    nor may "Apache" appear in their name, without prior written
+ *    permission of the Apache Software Foundation.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation and was
+ * originally based on software copyright (c) 1999, International
+ * Business Machines, Inc., http://www.ibm.com.  For more
+ * information on the Apache Software Foundation, please see
+ * &lt;http://www.apache.org/&gt;.
+ */
+</pre>
+
+<P><A NAME=Bot_Of_Page></A></P>
+</BODY></HTML>
+
